@@ -1,12 +1,15 @@
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.imageio.*;
 import javax.swing.*;
 
-/*
+/**
+ * 
  * Class for the opening screen.
- * This is where user can decide
+ * This is where users decide if they want to host a game or join a game.
+ * 
  */
 public class OpeningScreen extends JFrame {
 	
@@ -19,6 +22,14 @@ public class OpeningScreen extends JFrame {
 	private ImageIcon img;
 	private BufferedImage logo;
 	
+	/**
+	 * 
+	 * Constructor for class OpeningScreen.
+	 * 
+	 * @param	w	width of frame
+	 * @param	h	height of frame
+	 * 
+	 */
 	public OpeningScreen( int w, int h ) {
 		width = w;
 		height = h;
@@ -29,7 +40,7 @@ public class OpeningScreen extends JFrame {
 		container = this.getContentPane();
 		img = new ImageIcon();
 		try {
-			logo = ImageIO.read(new File("/pencil.png"));
+			logo = ImageIO.read(new File("pencil.png"));
 			img.setImage(logo);
 			iconLabel.setIcon(img);
 		} catch (IOException e) {
@@ -37,13 +48,76 @@ public class OpeningScreen extends JFrame {
 		}
 	}
 	
+	/**
+	 * 
+	 * Sets up the opening screen.
+	 * 
+	 */
 	public void setUpOpeningScreen() {
+		this.setSize(width, height);
 		container.setLayout(new BorderLayout());
-		container.add(iconLabel);
+		container.add(iconLabel, BorderLayout.NORTH);
 		buttonPanel.add(hostGame);
 		buttonPanel.add(joinGame);
-		container.add(buttonPanel);
+		container.add(buttonPanel, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 	}
+	
+	/**
+	 * 
+	 * Sets up the Host Game button.
+	 * 
+	 */
+	public void hostButton() {
+		ActionListener host = new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+					HostWindow hw = new HostWindow(300,200);
+					hw.setUpHostWindow();
+					closeOpeningScreen();
+			}
+		};
+		hostGame.addActionListener(host);
+	}
+	
+	/**
+	 * 
+	 * Sets up the Join Game button.
+	 * 
+	 */
+	public void joinButton() {
+		ActionListener join = new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				Player jw = new Player();
+				jw.setUpJoinWindow();
+				closeOpeningScreen();
+			}
+		};
+		joinGame.addActionListener(join);
+	}
+	
+	/**
+	 * 
+	 * Closes the opening screen. 
+	 * 
+	 */
+	public void closeOpeningScreen() {
+		 this.setVisible(false);
+		 this.dispose();
+	}
+	
+	
+	/**
+	 * 
+	 * Main method
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		OpeningScreen os = new OpeningScreen(300,370);
+		os.setUpOpeningScreen();
+		os.hostButton();
+		os.joinButton();
+	}
+	
 }
