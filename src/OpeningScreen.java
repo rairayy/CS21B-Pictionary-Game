@@ -6,10 +6,8 @@ import javax.imageio.*;
 import javax.swing.*;
 
 /**
- * 
  * Class for the opening screen.
  * This is where users decide if they want to host a game or join a game.
- * 
  */
 public class OpeningScreen extends JFrame {
 	
@@ -23,12 +21,10 @@ public class OpeningScreen extends JFrame {
 	private BufferedImage logo;
 	
 	/**
-	 * 
 	 * Constructor for class OpeningScreen.
 	 * 
 	 * @param	w	width of frame
 	 * @param	h	height of frame
-	 * 
 	 */
 	public OpeningScreen( int w, int h ) {
 		width = w;
@@ -49,9 +45,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * 
 	 * Sets up the opening screen.
-	 * 
 	 */
 	public void setUpOpeningScreen() {
 		this.setSize(width, height);
@@ -65,9 +59,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * 
 	 * Sets up the Host Game button.
-	 * 
 	 */
 	public void hostButton() {
 		ActionListener host = new ActionListener() {
@@ -81,14 +73,12 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * 
 	 * Sets up the Join Game button.
-	 * 
 	 */
 	public void joinButton() {
 		ActionListener join = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				Player jw = new Player();
+				JoinWindow jw = new JoinWindow();
 				jw.setUpJoinWindow();
 				closeOpeningScreen();
 			}
@@ -97,9 +87,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * 
 	 * Closes the opening screen. 
-	 * 
 	 */
 	public void closeOpeningScreen() {
 		 this.setVisible(false);
@@ -108,7 +96,6 @@ public class OpeningScreen extends JFrame {
 	
 	
 	/**
-	 * 
 	 * Main method
 	 * 
 	 * @param args

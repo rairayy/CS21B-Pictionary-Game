@@ -6,9 +6,7 @@ import java.awt.event.*;
 import java.awt.geom.*;
 
 /**
- * 
  * Class for the window of the host.
- *
  */
 public class JoinWindow extends JFrame {
 
@@ -17,15 +15,23 @@ public class JoinWindow extends JFrame {
 	private JButton joinGame;
 	private Container container;
 	private JPanel textField;
+	private String ip;
 	
+	/**
+	 * Constructor for class JoinWindow. 	
+	 */
 	public JoinWindow() {
 		label = new JLabel("Input Server IP Address:");
 		inputIPAddress = new JTextField(20);
 		joinGame = new JButton("Join Game");
 		container = this.getContentPane();
 		textField = new JPanel();
+		ip = "localhost";
 	}
 	
+	/**
+	 * Sets up the join window.
+	 */
 	public void setUpJoinWindow() {
 		this.setSize(300,120);
 		container.setLayout(new BorderLayout());
@@ -37,8 +43,33 @@ public class JoinWindow extends JFrame {
 		this.setVisible(true);
 	}
 	
+	/**
+	 * Closes the join window. 
+	 */
+	public void closeOpeningScreen() {
+		 this.setVisible(false);
+		 this.dispose();
+	}
+	
+	/**
+	 * Sets up the "Join Game" button.
+	 */
+	public void getIP() {
+		ActionListener getIP = new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				ip = inputIPAddress.getText();
+				Player p = new Player(1000, 1000, ip);
+				p.connectToServer();
+				p.setUpGUI();
+				closeOpeningScreen();
+			}
+		};
+		joinGame.addActionListener(getIP);
+	}
+	
 	public static void main(String[] args) {
         JoinWindow p = new JoinWindow();
         p.setUpJoinWindow();
+        p.getIP();
     }
 }
