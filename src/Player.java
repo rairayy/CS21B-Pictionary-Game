@@ -145,9 +145,9 @@ public class Player extends JFrame{
     private class DrawingComponent extends JComponent {
     	
     }
-    
+//    
 //    public static void main(String[] args) {
-//        Player p = new Player(1000, 1000, ip);
+//        Player p = new Player(1000, 1000,);
 //        p.connectToServer();
 //        p.setUpGUI();
 //    }

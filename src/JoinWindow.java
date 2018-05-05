@@ -40,6 +40,7 @@ public class JoinWindow extends JFrame {
 		container.add(textField, BorderLayout.CENTER);
 		container.add(joinGame, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.getIP();
 		this.setVisible(true);
 	}
 	
@@ -58,7 +59,7 @@ public class JoinWindow extends JFrame {
 		ActionListener getIP = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				ip = inputIPAddress.getText();
-				Player p = new Player(1000, 1000, ip);
+				Player p = new Player(300, 300, ip);
 				p.connectToServer();
 				p.setUpGUI();
 				closeOpeningScreen();
@@ -66,10 +67,4 @@ public class JoinWindow extends JFrame {
 		};
 		joinGame.addActionListener(getIP);
 	}
-	
-	public static void main(String[] args) {
-        JoinWindow p = new JoinWindow();
-        p.setUpJoinWindow();
-        p.getIP();
-    }
 }

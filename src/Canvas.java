@@ -85,19 +85,19 @@ public class Canvas extends JComponent {
 		g2d.setPaint(Color.WHITE);
 	}
 	
-	public int getOldX() {
-		return oldX;
-	}
-	
-	public int getOldY() {
-		return oldY;
-	}
-	
-	public int getCurrX() {
-		return currX;
-	}
-	
-	public int getCurrY() {
-		return currY;
-	}
+//	public int getOldX() {
+//		return oldX;
+//	}
+//	
+//	public int getOldY() {
+//		return oldY;
+//	}
+//	
+//	public int getCurrX() {
+//		return currX;
+//	}
+//	
+//	public int getCurrY() {
+//		return currY;
+//	}
 }

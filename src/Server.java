@@ -80,7 +80,6 @@ public class Server {
                     if(!stop) {
                     	break;
                     }
-                    
                 }
                 for(ServerSideConnection s : players)
                 	s.closeConnection();

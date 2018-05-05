@@ -55,6 +55,8 @@ public class OpeningScreen extends JFrame {
 		buttonPanel.add(joinGame);
 		container.add(buttonPanel, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.hostButton();
+		this.joinButton();
 		this.setVisible(true);
 	}
 	
@@ -66,7 +68,6 @@ public class OpeningScreen extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 					HostWindow hw = new HostWindow(300,200);
 					hw.setUpHostWindow();
-					closeOpeningScreen();
 			}
 		};
 		hostGame.addActionListener(host);
@@ -103,8 +104,6 @@ public class OpeningScreen extends JFrame {
 	public static void main(String[] args) {
 		OpeningScreen os = new OpeningScreen(300,370);
 		os.setUpOpeningScreen();
-		os.hostButton();
-		os.joinButton();
 	}
 	
 }
