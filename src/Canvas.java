@@ -8,6 +8,16 @@ public class Canvas extends JComponent {
 	private int currX, currY, oldX, oldY;
 	private float thickness;
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public Canvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
