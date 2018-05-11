@@ -30,8 +30,8 @@ public class GameServer {
 	
 	private ArrayList<ReadFromClient> readRunnables;
 	private ArrayList<WriteToClient> writeRunnables;
-	private double oldX1, oldY1, currX1, currY1;
-	private double oldX2, oldY2, currX2, currY2;
+	private int oldX1, oldY1, currX1, currY1;
+	private int oldX2, oldY2, currX2, currY2;
 	private int teamNum;
 	
 	public GameServer() {
@@ -160,19 +160,18 @@ public class GameServer {
 				
 				while(true) {
 					if(teamNum == 1) {
-						dataOut.writeDouble(oldX1);
-						dataOut.writeDouble(oldY1);
-						dataOut.writeDouble(currX1);
-						dataOut.writeDouble(currY1);
-					}
-					else {
-						dataOut.writeDouble(oldX2);
-						dataOut.writeDouble(oldY2);
-						dataOut.writeDouble(currX2);
-						dataOut.writeDouble(currY2);
+						dataOut.writeInt(oldX1);
+						dataOut.writeInt(oldY1);
+						dataOut.writeInt(currX1);
+						dataOut.writeInt(currY1);
+					} else {
+						dataOut.writeInt(oldX2);
+						dataOut.writeInt(oldY2);
+						dataOut.writeInt(currX2);
+						dataOut.writeInt(currY2);
 					}
 					try {
-						Thread.sleep(25);
+						Thread.sleep(5);
 					} catch(InterruptedException ex) {
 						System.out.println("InterruptedException from WTC run()");
 					}

@@ -31,6 +31,7 @@ public class HostWindow extends JFrame {
 	
 	public void setUpHostWindow() {
 		this.setSize(width, height);
+		this.setTitle("Host Window");
 		container.setLayout(new BorderLayout());
 		container.add(stuff, BorderLayout.NORTH);
 		stuff.setEditable(false);
@@ -41,6 +42,7 @@ public class HostWindow extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.startAcceptingConnections();
 		this.stopAcceptingConnections();
+		stopAccepting.setEnabled(false);
 		this.setVisible(true);
 	}
 
@@ -54,6 +56,8 @@ public class HostWindow extends JFrame {
 					}
 				});
 				t.start();
+				startAccepting.setEnabled(false);
+				stopAccepting.setEnabled(true);
 			}
 		};
 		startAccepting.addActionListener(accept);

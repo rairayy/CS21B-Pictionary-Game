@@ -7,10 +7,13 @@ public class WatchCanvas extends JComponent {
 	private Graphics2D g2d;
 	private int currX, currY, oldX, oldY;
 	private float thickness;
+	private boolean mousePressed, mouseDragged;
 	
 	public WatchCanvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
+		mousePressed = true;
+		mouseDragged = true;
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -19,11 +22,21 @@ public class WatchCanvas extends JComponent {
 			g2d = (Graphics2D) image.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
-		} else {
-			BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-			g2d.setStroke(bs);  
-			g2d.drawLine(oldX, oldY, currX, currY);
 		}
+//		if ( mouseDragged ) {
+//			BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+//			g2d.setStroke(bs);  
+//			g2d.drawLine(oldY, oldX, currY, currX);
+//			repaint();
+//			oldX = currX;
+//			oldY = currY;
+//		}		
+		BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		g2d.setStroke(bs);  
+		g2d.drawLine(oldY, oldX, currY, currX);
+		repaint();
+//		oldX = currX;
+//		oldY = currY;
 		g.drawImage(image, 0, 0, null);
 	}
 	
@@ -77,19 +90,12 @@ public class WatchCanvas extends JComponent {
 		g2d.setPaint(Color.WHITE);
 	}
 	
-	public int getOldX() {
-		return oldX;
+	public void setMousePressed(boolean mp) {
+		mousePressed = mp;
 	}
 	
-	public int getOldY() {
-		return oldY;
+	public void setMouseDragged(boolean md) {
+		mouseDragged = md;
 	}
 	
-	public int getCurrX() {
-		return currX;
-	}
-	
-	public int getCurrY() {
-		return currY;
-	}
 }

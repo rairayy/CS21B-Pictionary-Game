@@ -8,11 +8,16 @@ public class Canvas extends JComponent {
 	private int currX, currY, oldX, oldY;
 	private float thickness;
 	
+	private boolean mousePressed, mouseDragged;
+	
 	public Canvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
+		mousePressed = false;
+		mouseDragged = false;
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
+				mousePressed = true;
 				oldX = e.getX();
 				oldY = e.getY();
 			}
@@ -20,6 +25,7 @@ public class Canvas extends JComponent {
 		
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
+				mouseDragged = true;
 				currX = e.getX();
 				currY = e.getY();				
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
@@ -99,5 +105,13 @@ public class Canvas extends JComponent {
 	
 	public int getCurrY() {
 		return currY;
+	}
+	
+	public boolean getMousePressed() {
+		return mousePressed;
+	}
+	
+	public boolean getMouseDragged() {
+		return mouseDragged;
 	}
 }

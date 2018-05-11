@@ -41,6 +41,7 @@ public class JoinWindow extends JFrame {
 	 */
 	public void setUpJoinWindow() {
 		this.setSize(300,200);
+		this.setTitle("Join Window");
 		container.setLayout(new GridLayout(3,1));
 		ipPanel.add(ipLabel);
 		ipPanel.add(inputIPAddress);

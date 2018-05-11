@@ -49,6 +49,7 @@ public class OpeningScreen extends JFrame {
 	 */
 	public void setUpOpeningScreen() {
 		this.setSize(width, height);
+		this.setTitle("Opening Screen");
 		container.setLayout(new BorderLayout());
 		container.add(iconLabel, BorderLayout.NORTH);
 		buttonPanel.add(hostGame);
@@ -56,7 +57,7 @@ public class OpeningScreen extends JFrame {
 		container.add(buttonPanel, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.hostButton();
-		this.joinButton();
+		this.joinButton();	
 		this.setVisible(true);
 	}
 	

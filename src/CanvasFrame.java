@@ -4,6 +4,9 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 
+/**
+ * Class for setting up the CanvasFrame. Extends JFrame.
+ */
 public class CanvasFrame extends JFrame {
 	
 	private int width;
@@ -25,7 +28,16 @@ public class CanvasFrame extends JFrame {
 	private WriteToServer wtsRunnable;
 	private Socket socket;
 	private int oldX, oldY, currX, currY;
-
+	
+	/**
+	 * 
+	 * Constructor for CanvasFrame()
+	 * 
+	 * @param w width of canvas
+	 * @param h height of canvas
+	 * @param n name of player
+	 * @param i ip address
+	 */
 	public CanvasFrame(int w, int h, String n, String i) {
 		canvas = new Canvas();
 		watchCanvas = new WatchCanvas();
@@ -35,6 +47,10 @@ public class CanvasFrame extends JFrame {
 		name = n;
 		ip = i;
 	}
+	
+	/**
+	 * Sets up the CanvasFrame()
+	 */
 	public void setUpFrame() {
 		this.setSize(width, height);
 		this.setTitle("Player #" + playerID);
@@ -54,10 +70,6 @@ public class CanvasFrame extends JFrame {
 		playerName = new JLabel("Your Name: " + name);
 		artistName = new JLabel("Your Team Artist: ");
 		container.setLayout(new BorderLayout());
-		if(playerID == artistIndex)
-			container.add(canvas, BorderLayout.CENTER);
-		else
-			container.add(watchCanvas, BorderLayout.CENTER);			
 		buttonPanel.setLayout(new GridLayout(1,10));
 		buttonPanel.add(five);
 		buttonPanel.add(ten);
@@ -73,10 +85,21 @@ public class CanvasFrame extends JFrame {
 //		WaitingScreen ws = new WaitingScreen();
 //		ws.setUpGUI();
 //		ws.setVisible(true);
-		this.setVisible(true);
+//		this.setVisible(true);
 		this.getContentPane().setBackground(Color.WHITE);
 	}
 	
+	public void updateVisibility() {
+		if(playerID == artistIndex)
+			container.add(canvas, BorderLayout.CENTER);
+		else
+			container.add(watchCanvas, BorderLayout.CENTER);
+		this.setVisible(true);
+	}
+	
+	/**
+	 * Sets up the buttons
+	 */
 	public void setUpButtons() {
 		ActionListener al = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -115,6 +138,9 @@ public class CanvasFrame extends JFrame {
 		eraser.addActionListener(al);
 	}
 	
+	/**
+	 * Connects the CanvasFrame to the server
+	 */
 	public void connectToServer() {
     	try {
 			socket = new Socket("localhost", 45371);
@@ -133,6 +159,10 @@ public class CanvasFrame extends JFrame {
 		}
     }
 	
+	/**
+	 * Inner class that reads from the server
+	 * Implements Runnable
+	 */
 	private class ReadFromServer implements Runnable {
 		
 		private DataInputStream dataIn;
@@ -146,9 +176,9 @@ public class CanvasFrame extends JFrame {
 			try {
 				teamNum = dataIn.readInt();
 				artistIndex = dataIn.readInt();
+				updateVisibility();
 				System.out.println("Team Num #" + teamNum);
 				System.out.println("Artist Num #" + artistIndex);
-				
 				while(true) {
 					if(artistIndex != playerID) {
 						oldX = dataIn.readInt();
@@ -156,6 +186,10 @@ public class CanvasFrame extends JFrame {
 						currX = dataIn.readInt();
 						currY = dataIn.readInt();
 						watchCanvas.setNewCoords(oldX, oldY, currX, currY);
+						watchCanvas.setMousePressed(canvas.getMousePressed());
+						watchCanvas.setMouseDragged(canvas.getMouseDragged());
+//						watchCanvas.setCurrX(currY);
+//						watchCanvas.setCurrY(currX);
 						watchCanvas.repaint();
 					}
 				}
@@ -164,8 +198,16 @@ public class CanvasFrame extends JFrame {
 				System.out.println("IOException from RFS run()");
 			}
 		}
+		
+		public int sendArtistIndex() {
+			return artistIndex;
+		}
 	}
 
+	/**
+	 * Class that writes to the server
+	 * Implements Runnable 
+	 */
 	private class WriteToServer implements Runnable {
 		
 		private DataOutputStream dataOut;
@@ -191,7 +233,7 @@ public class CanvasFrame extends JFrame {
 					dataOut.writeInt(currX);
 					dataOut.writeInt(currY);
 					try {
-						Thread.sleep(25);
+						Thread.sleep(5);
 					} catch(InterruptedException ex) {
 						System.out.println("InterruptedException from WTS run()");
 					}
@@ -203,6 +245,11 @@ public class CanvasFrame extends JFrame {
 		}	
 	}
 	
+	/**
+	 * Main method
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		CanvasFrame cf = new CanvasFrame(800, 640, "Hello", "localhost");
 		cf.connectToServer();
