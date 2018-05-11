@@ -2,34 +2,15 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class Canvas extends JComponent {
+public class WatchCanvas extends JComponent {
 	private Image image;
 	private Graphics2D g2d;
 	private int currX, currY, oldX, oldY;
 	private float thickness;
 	
-	public Canvas() {
+	public WatchCanvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
-		addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				oldX = e.getX();
-				oldY = e.getY();
-			}
-		});
-		
-		addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseDragged(MouseEvent e) {
-				currX = e.getX();
-				currY = e.getY();				
-				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-			    g2d.setStroke(bs);  
-			    g2d.drawLine(oldX, oldY, currX, currY);
-				repaint();
-				oldX = currX;
-				oldY = currY;
-			}
-		});
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -38,8 +19,19 @@ public class Canvas extends JComponent {
 			g2d = (Graphics2D) image.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
+		} else {
+			BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+			g2d.setStroke(bs);  
+			g2d.drawLine(oldX, oldY, currX, currY);
 		}
 		g.drawImage(image, 0, 0, null);
+	}
+	
+	public void setNewCoords(int oX, int oY, int cX, int cY) {		
+		oldX = oX;
+		oldY = oY;
+		currX = cX;
+		currY = cY;
 	}
 	
 	public void set5() {

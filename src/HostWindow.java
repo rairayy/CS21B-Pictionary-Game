@@ -11,22 +11,22 @@ public class HostWindow extends JFrame {
 
 	private int width;
 	private int height;
-	private JButton stopAccepting, startAccepting, joinGame;
+	private JButton stopAccepting, startAccepting;
 	private JPanel buttons;
 	private Container container;
 	private JTextArea stuff;
-	private Server s;
+	private GameServer s;
+	private boolean stopBool;
 	
-	public HostWindow(int w, int h) {
+	public HostWindow( int w, int h) {
 		width = w;
 		height = h;
 		startAccepting = new JButton("Start Accepting Connections");
 		stopAccepting = new JButton("Stop Accepting Connections");
-		joinGame = new JButton("Join Game");
 		container = this.getContentPane();
 		stuff = new JTextArea("AAA", 5, 2);
 		buttons = new JPanel();
-		s = new Server();
+		stopBool = false;
 	}
 	
 	public void setUpHostWindow() {
@@ -37,23 +37,19 @@ public class HostWindow extends JFrame {
 		buttons.setLayout(new FlowLayout());
 		buttons.add(startAccepting);
 		buttons.add(stopAccepting);
-		buttons.add(joinGame);
-		joinGame.setEnabled(false);
 		container.add(buttons, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.startAcceptingConnections();
 		this.stopAcceptingConnections();
-		this.joinGame();
 		this.setVisible(true);
 	}
 
 	public void startAcceptingConnections() {
 		ActionListener accept = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				joinGame.setEnabled(true);
-				startAccepting.setEnabled(false);
 				Thread t = new Thread(new Runnable() {
 					public void run() {
+						s = new GameServer();
 						s.acceptConnections();
 					}
 				});
@@ -66,26 +62,31 @@ public class HostWindow extends JFrame {
 	public void stopAcceptingConnections() {
 		ActionListener stop = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				s.stopAccepting();
 			}
 		};
 		stopAccepting.addActionListener(stop);
-	}
-
-	public void joinGame() {
-		ActionListener join = new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				Thread t = new Thread(new Runnable() {
-					public void run() {
-						Player p = new Player(300, 300, "localhost");
-						p.connectToServer();
-						p.setUpGUI();
-						joinGame.setEnabled(false);
-					}
-				});
-				t.start();
-			}
-		};
-		joinGame.addActionListener(join);
+		
 	}
 	
+	public void closeHostScreen() {
+		 this.setVisible(false);
+		 this.dispose();
+	}
+	
+	/*private class HostThread implements Runnable {
+		
+		public void run() {
+			s = new GameServer();
+			s.acceptConnections();
+			
+			while(true) {
+				if(stopBool) {
+					System.out.println("stop bool true");
+					s.stopAccepting();
+					break;
+				}
+			}
+		}
+	}*/
 }
