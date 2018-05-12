@@ -33,11 +33,16 @@ public class GameServer {
 	private int oldX1, oldY1, currX1, currY1;
 	private int oldX2, oldY2, currX2, currY2;
 	private int teamNum;
+	private boolean canvasPressed1, canvasDragged1, canvasPressed2, canvasDragged2;
 	
 	public GameServer() {
 		System.out.println("==== GAME SERVER ====");
 		numPlayers = 0;
 		continueAccepting = true;
+		canvasPressed1 = false;
+		canvasDragged1 = false;
+		canvasPressed2 = false;
+		canvasDragged2 = false;
 		readRunnables = new ArrayList<ReadFromClient>();
 		writeRunnables = new ArrayList<WriteToClient>();
 				
@@ -110,20 +115,33 @@ public class GameServer {
 		public void run() {
 			try {
 				
-				artist1Name = dataIn.readUTF();
-				artist2Name = dataIn.readUTF();
+//				if(playerID == artistIndex1) {
+//					artist1Name = dataIn.readUTF();
+//					System.out.println(artist1Name);
+//				} else if(playerID == artistIndex2) {
+//					artist2Name = dataIn.readUTF();
+//					System.out.println(artist2Name);
+//				}
 				
 				while(true) {
 					if(playerID == artistIndex1) {
-						oldX1 = dataIn.readInt();
-						oldY1 = dataIn.readInt();
-						currX1 = dataIn.readInt();
-						currY1 = dataIn.readInt();
+						canvasPressed1 = dataIn.readBoolean();
+						canvasDragged1 = dataIn.readBoolean();
+						if(canvasPressed1 && canvasDragged1) {
+							oldX1 = dataIn.readInt();
+							oldY1 = dataIn.readInt();
+							currX1 = dataIn.readInt();
+							currY1 = dataIn.readInt();
+						}
 					} else if (playerID == artistIndex2) {
-						oldX2 = dataIn.readInt();
-						oldY2 = dataIn.readInt();
-						currX2 = dataIn.readInt();
-						currY2 = dataIn.readInt();
+						canvasPressed2 = dataIn.readBoolean();
+						canvasDragged2 = dataIn.readBoolean();
+						if(canvasPressed2 && canvasDragged2) {
+							oldX2 = dataIn.readInt();
+							oldY2 = dataIn.readInt();
+							currX2 = dataIn.readInt();
+							currY2 = dataIn.readInt();
+						}
 					}
 				}
 				
@@ -147,34 +165,45 @@ public class GameServer {
 			try {
 				artistIndex1 = 1;
 				artistIndex2 = totalNumPlayers/2 + 1;
-				teamNum = determineTeamNumber();
+//				teamNum = determineTeamNumber();
+				teamNum = 1;
 				dataOut.writeInt(teamNum);
 				if(teamNum == 1)
 					dataOut.writeInt(artistIndex1);
 				else
 					dataOut.writeInt(artistIndex2);
 				dataOut.flush();
-				System.out.println("Team Num #" + teamNum);
-				System.out.println("Artist1 Num #" + artistIndex1);
-				System.out.println("Artist2 Num #" + artistIndex2);
+				System.out.println("Server: Team Num #" + teamNum);
+				System.out.println("Server: Artist1 Num #" + artistIndex1);
+				System.out.println("Server: Artist2 Num #" + artistIndex2);
 				
 				while(true) {
-					if(teamNum == 1) {
-						dataOut.writeInt(oldX1);
-						dataOut.writeInt(oldY1);
-						dataOut.writeInt(currX1);
-						dataOut.writeInt(currY1);
-					} else {
-						dataOut.writeInt(oldX2);
-						dataOut.writeInt(oldY2);
-						dataOut.writeInt(currX2);
-						dataOut.writeInt(currY2);
+					if(playerID != artistIndex1 && teamNum == 1) {
+						dataOut.writeBoolean(canvasPressed1);
+						dataOut.writeBoolean(canvasDragged1);
+						if(canvasPressed1 && canvasDragged1) {
+							dataOut.writeInt(oldX1);
+							dataOut.writeInt(oldY1);
+							dataOut.writeInt(currX1);
+							dataOut.writeInt(currY1);
+						}
 					}
-					try {
-						Thread.sleep(5);
-					} catch(InterruptedException ex) {
-						System.out.println("InterruptedException from WTC run()");
+					else if(playerID != artistIndex2 && teamNum == 2) {
+						dataOut.writeBoolean(canvasPressed2);
+						dataOut.writeBoolean(canvasDragged2);
+						if(canvasPressed2 && canvasDragged2) {
+							dataOut.writeInt(oldX2);
+							dataOut.writeInt(oldY2);
+							dataOut.writeInt(currX2);
+							dataOut.writeInt(currY2);
+						}
 					}
+					dataOut.flush();
+//					try {
+//						Thread.sleep(5);
+//					} catch(InterruptedException ex) {
+//						System.out.println("InterruptedException from WTC run()");
+//					}
 				}
 				
 			} catch(IOException ex) {

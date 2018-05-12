@@ -17,17 +17,22 @@ public class Canvas extends JComponent {
 		mouseDragged = false;
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				mousePressed = true;
 				oldX = e.getX();
 				oldY = e.getY();
+				mousePressed = true;
+			}
+			
+			public void mouseReleased(MouseEvent e) {
+				mousePressed = false;
+				mouseDragged = false;
 			}
 		});
 		
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
-				mouseDragged = true;
 				currX = e.getX();
 				currY = e.getY();				
+				mouseDragged = true;
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 			    g2d.setStroke(bs);  
 			    g2d.drawLine(oldX, oldY, currX, currY);
@@ -108,10 +113,12 @@ public class Canvas extends JComponent {
 	}
 	
 	public boolean getMousePressed() {
+//		System.out.println(mousePressed);
 		return mousePressed;
 	}
 	
 	public boolean getMouseDragged() {
+//		System.out.println(mouseDragged);
 		return mouseDragged;
 	}
 }

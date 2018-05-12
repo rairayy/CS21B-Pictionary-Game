@@ -28,6 +28,7 @@ public class CanvasFrame extends JFrame {
 	private WriteToServer wtsRunnable;
 	private Socket socket;
 	private int oldX, oldY, currX, currY;
+	private boolean mousePressed, mouseDragged;
 	
 	/**
 	 * 
@@ -39,13 +40,13 @@ public class CanvasFrame extends JFrame {
 	 * @param i ip address
 	 */
 	public CanvasFrame(int w, int h, String n, String i) {
-		canvas = new Canvas();
-		watchCanvas = new WatchCanvas();
 		width = w;
 		height = h;
 		container = this.getContentPane();
 		name = n;
 		ip = i;
+		mousePressed = false;
+		mouseDragged = false;
 	}
 	
 	/**
@@ -90,10 +91,14 @@ public class CanvasFrame extends JFrame {
 	}
 	
 	public void updateVisibility() {
-		if(playerID == artistIndex)
+		if(playerID == artistIndex) {
+			canvas = new Canvas();
 			container.add(canvas, BorderLayout.CENTER);
-		else
+		}
+		else {
+			watchCanvas = new WatchCanvas();
 			container.add(watchCanvas, BorderLayout.CENTER);
+		}
 		this.setVisible(true);
 	}
 	
@@ -166,6 +171,7 @@ public class CanvasFrame extends JFrame {
 	private class ReadFromServer implements Runnable {
 		
 		private DataInputStream dataIn;
+//		private DataOutputStream dataOut;
 		
 		public ReadFromServer(DataInputStream in) {
 			dataIn = in;
@@ -177,30 +183,33 @@ public class CanvasFrame extends JFrame {
 				teamNum = dataIn.readInt();
 				artistIndex = dataIn.readInt();
 				updateVisibility();
-				System.out.println("Team Num #" + teamNum);
-				System.out.println("Artist Num #" + artistIndex);
+				System.out.println("Player: Team Num #" + teamNum);
+				System.out.println("Player: Artist Num #" + artistIndex);
 				while(true) {
-					if(artistIndex != playerID) {
-						oldX = dataIn.readInt();
-						oldY = dataIn.readInt();
-						currX = dataIn.readInt();
-						currY = dataIn.readInt();
-						watchCanvas.setNewCoords(oldX, oldY, currX, currY);
-						watchCanvas.setMousePressed(canvas.getMousePressed());
-						watchCanvas.setMouseDragged(canvas.getMouseDragged());
-//						watchCanvas.setCurrX(currY);
-//						watchCanvas.setCurrY(currX);
-						watchCanvas.repaint();
+					if(artistIndex != playerID && artistIndex != 0) {
+						mousePressed = dataIn.readBoolean();
+						mouseDragged = dataIn.readBoolean();
+//						System.out.println("Pressed: "+mousePressed);
+//						System.out.println("Dragged: " + mouseDragged);
+						if(mousePressed && mouseDragged) {
+							oldX = dataIn.readInt();
+							oldY = dataIn.readInt();
+							currX = dataIn.readInt();
+							currY = dataIn.readInt();
+							System.out.printf("%s, %s, %s, %s", oldX, oldY, currX, currY);
+	//						watchCanvas.setMousePressed(mousePressed);
+	//						watchCanvas.setMouseDragged(mouseDragged);
+							watchCanvas.setNewCoords(oldX, oldY, currX, currY);
+	//						watchCanvas.setCurrX(currY);
+	//						watchCanvas.setCurrY(currX);
+							watchCanvas.repaint();
+						}
 					}
 				}
 				
 			} catch(IOException ex) {
 				System.out.println("IOException from RFS run()");
 			}
-		}
-		
-		public int sendArtistIndex() {
-			return artistIndex;
 		}
 	}
 
@@ -219,24 +228,37 @@ public class CanvasFrame extends JFrame {
 		
 		public void run() {
 			try {
-				if(playerID == artistIndex)
-					dataOut.writeUTF(name);
-				dataOut.flush();
+//				if(playerID == artistIndex) {
+//					dataOut.writeUTF(name);
+//				}
+//				dataOut.flush();
 				
 				while(true) {
-					oldX = canvas.getOldX();
-					oldY = canvas.getOldY();
-					currX = canvas.getCurrX();
-					currY = canvas.getCurrY();
-					dataOut.writeInt(oldX);
-					dataOut.writeInt(oldY);
-					dataOut.writeInt(currX);
-					dataOut.writeInt(currY);
-					try {
-						Thread.sleep(5);
-					} catch(InterruptedException ex) {
-						System.out.println("InterruptedException from WTS run()");
+//					System.out.println("Artist #" + artistIndex);
+					if(playerID == artistIndex && canvas != null) {
+//						System.out.println("artist");
+						boolean canvasPressed = canvas.getMousePressed();
+						boolean canvasDragged = canvas.getMouseDragged();
+						dataOut.writeBoolean(canvasPressed);
+						dataOut.writeBoolean(canvasDragged);
+						if(canvasPressed && canvasDragged) {
+							oldX = canvas.getOldX();
+							oldY = canvas.getOldY();
+							currX = canvas.getCurrX();
+							currY = canvas.getCurrY();
+							dataOut.writeInt(oldX);
+							dataOut.writeInt(oldY);
+							dataOut.writeInt(currX);
+							dataOut.writeInt(currY);
+							System.out.printf("%s, %s, %s, %s\n", oldX, oldY, currX, currY);
+						}
+						dataOut.flush();
 					}
+//					try {
+//						Thread.sleep(5);
+//					} catch(InterruptedException ex) {
+//						System.out.println("InterruptedException from WTS run()");
+//					}
 				}
 				
 			} catch(IOException ex) {

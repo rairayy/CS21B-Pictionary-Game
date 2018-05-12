@@ -23,18 +23,20 @@ public class WatchCanvas extends JComponent {
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
 		}
-//		if ( mouseDragged ) {
+//		if ( mousePressed || mouseDragged ) {
 //			BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 //			g2d.setStroke(bs);  
 //			g2d.drawLine(oldY, oldX, currY, currX);
 //			repaint();
 //			oldX = currX;
 //			oldY = currY;
-//		}		
-		BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-		g2d.setStroke(bs);  
-		g2d.drawLine(oldY, oldX, currY, currX);
-		repaint();
+////		}	
+		if((oldX != 0 && oldY != 0)) {
+			BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+			g2d.setStroke(bs);  
+			g2d.drawLine(oldY, oldX, currY, currX);
+			repaint();
+		}
 //		oldX = currX;
 //		oldY = currY;
 		g.drawImage(image, 0, 0, null);
