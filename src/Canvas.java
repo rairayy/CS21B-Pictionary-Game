@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -7,6 +8,7 @@ public class Canvas extends JComponent {
 	private Graphics2D g2d;
 	private int currX, currY, oldX, oldY;
 	private float thickness;
+	private ArrayList<Integer> xCoords, yCoords;
 	
 	private boolean mousePressed, mouseDragged, mouseReleased;
 	
@@ -15,16 +17,22 @@ public class Canvas extends JComponent {
 		setDoubleBuffered(false);
 		mousePressed = false;
 		mouseDragged = false;
+		xCoords = new ArrayList<Integer>();
+		yCoords = new ArrayList<Integer>();
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				mousePressed = true;
 				oldX = e.getX();
 				oldY = e.getY();
+				xCoords.add(oldX);
+				yCoords.add(oldY);
 			}
 			
 			public void mouseReleased(MouseEvent e) {
 				mousePressed = false;
 				mouseDragged = false;
+				xCoords = new ArrayList<Integer>();
+				yCoords = new ArrayList<Integer>();
 			}
 		});
 		
@@ -32,7 +40,11 @@ public class Canvas extends JComponent {
 			public void mouseDragged(MouseEvent e) {
 				mouseDragged = true;
 				currX = e.getX();
-				currY = e.getY();				
+				currY = e.getY();
+				if(currX != 0 && currY != 0) {
+					xCoords.add(currX);
+					yCoords.add(currY);
+				}
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 			    g2d.setStroke(bs);  
 			    g2d.drawLine(oldX, oldY, currX, currY);
@@ -118,5 +130,13 @@ public class Canvas extends JComponent {
 	
 	public boolean getMouseDragged() {
 		return mouseDragged;
+	}
+	
+	public ArrayList<Integer> getXCoords() {
+		return xCoords;
+	}
+
+	public ArrayList<Integer> getYCoords() {
+		return yCoords;
 	}
 }

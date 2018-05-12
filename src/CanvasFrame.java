@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
  * Class for setting up the CanvasFrame. Extends JFrame.
@@ -192,23 +193,40 @@ public class CanvasFrame extends JFrame {
 				System.out.println("Team Num #" + teamNum);
 				System.out.println("Artist Num #" + artistIndex);
 				while(true) {
-					if(artistIndex != playerID) {
-						oldX = dataIn.readInt();
-						oldY = dataIn.readInt();
-						currX = dataIn.readInt();
-						currY = dataIn.readInt();
-						watchCanvas.setNewCoords(oldX, oldY, currX, currY);
+					if(artistIndex != playerID && artistIndex != 0) {
+						ArrayList<Integer> xCoords = new ArrayList<Integer>();
+						ArrayList<Integer> yCoords = new ArrayList<Integer>();
+						int size = dataIn.readInt();
+						for(int i = 0; i < size; i++) {
+							int currX = dataIn.readInt();
+							int currY = dataIn.readInt();
+							if(currX != 0 && currY != 0) {
+								xCoords.add(currX);
+								yCoords.add(currY);
+								System.out.println("Frame: " + currX + ", " + currY);
+							}
+						}
+//						if(yCoords.size() > 0)
+//							System.out.println("CanvasFrame Size:" + yCoords.size());
+						watchCanvas.setArrayList(xCoords, yCoords);
+//						oldX = dataIn.readInt();
+//						System.out.println(xCoords.get(i+1) + yCoords.get(i+1));
+//						oldY = dataIn.readInt();
+//						currX = dataIn.readInt();
+//						currY = dataIn.readInt();
+//						watchCanvas.setNewCoords(oldX, oldY, currX, currY);
 						watchCanvas.repaint();
 					}
+//					try {
+//						Thread.sleep(25);
+//					} catch(InterruptedException ex) {
+//						System.out.println("InterruptedException from WTC run()");
+//					}
 				}
 				
 			} catch(IOException ex) {
 				System.out.println("IOException from RFS run()");
 			}
-		}
-		
-		public int sendArtistIndex() {
-			return artistIndex;
 		}
 		
 	}
@@ -228,23 +246,38 @@ public class CanvasFrame extends JFrame {
 		
 		public void run() {
 			try {
-				if(playerID == artistIndex)
-					dataOut.writeUTF(name);
-				dataOut.flush();
+//				if(playerID == artistIndex)
+//					dataOut.writeUTF(name);
+//				dataOut.flush();
 				
 				while(true) {
-					oldX = canvas.getOldX();
-					oldY = canvas.getOldY();
-					currX = canvas.getCurrX();
-					currY = canvas.getCurrY();
-					dataOut.writeInt(oldX);
-					dataOut.writeInt(oldY);
-					dataOut.writeInt(currX);
-					dataOut.writeInt(currY);
-					mousePressed = canvas.getMousePressed();
-					mouseDragged = canvas.getMouseDragged();
-					System.out.println(mousePressed);
-					System.out.println(mouseDragged);
+					if(playerID == artistIndex) {
+						ArrayList<Integer> xCoords = canvas.getXCoords();
+						ArrayList<Integer> yCoords = canvas.getYCoords();
+						dataOut.writeInt(xCoords.size());
+//						dataOut.flush();
+						for(int i = 0; i < xCoords.size(); i++) {
+//							if(xCoords.get(i) != 0 && yCoords.get(i) != 0) {
+								dataOut.writeInt(xCoords.get(i));
+								dataOut.writeInt(yCoords.get(i));
+								if(xCoords.get(i) != 0 && yCoords.get(i) != 0)
+									System.out.println("Artist: " + xCoords.get(i) + ", " + yCoords.get(i));
+//							}
+						}
+//						dataOut.flush();
+					}
+//					oldX = canvas.getOldX();
+//					oldY = canvas.getOldY();
+//					currX = canvas.getCurrX();
+//					currY = canvas.getCurrY();
+//					dataOut.writeInt(oldX);
+//					dataOut.writeInt(oldY);
+//					dataOut.writeInt(currX);
+//					dataOut.writeInt(currY);
+//					mousePressed = canvas.getMousePressed();
+//					mouseDragged = canvas.getMouseDragged();
+//					System.out.println(mousePressed);
+//					System.out.println(mouseDragged);
 					try {
 						Thread.sleep(7);
 					} catch(InterruptedException ex) {

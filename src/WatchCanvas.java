@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 public class WatchCanvas extends JComponent {
@@ -9,12 +11,15 @@ public class WatchCanvas extends JComponent {
 	private float thickness;
 	
 	private boolean mousePressed, mouseDragged;
+	private ArrayList<Integer> xCoords, yCoords;
 	
 	public WatchCanvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
 		mousePressed = false;
 		mouseDragged = false;
+		xCoords = new ArrayList<Integer>();
+		yCoords = new ArrayList<Integer>();
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -24,16 +29,30 @@ public class WatchCanvas extends JComponent {
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
 		}
-		if ( oldX != 0 && oldY != 0 ) {
-			if ( mousePressed || mouseDragged ) {
-				oldX = currX;
-				oldY = currY;
+//		if ( oldX != 0 && oldY != 0 ) {
+//			if ( !mousePressed || mouseDragged ) {
+//				oldX = currX;
+//				oldY = currY;
+//				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+//				g2d.setStroke(bs);  
+//				g2d.drawLine(oldY, oldX, currY, currX);
+//				repaint();
+//			}
+//			System.out.println(xCoords.size());
+			
+			// DOESNT WORK
+//			if(xCoords.size() > 0) {
+//				System.out.println("Canvas SizeX:" + xCoords.size());
+//				System.out.println("Canvas SizeY:" + yCoords.size());
+//			}
+			for(int i = 0; i < xCoords.size()-1; i++) {
+//				System.out.println("Canvas: " + xCoords.get(i+1) + ", " + yCoords.get(i+1));
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 				g2d.setStroke(bs);  
-				g2d.drawLine(oldY, oldX, currY, currX);
+				g2d.drawLine(xCoords.get(i), yCoords.get(i), xCoords.get(i+1), yCoords.get(i+1));
 				repaint();
 			}
-		}		
+//		}		
 		g.drawImage(image, 0, 0, null);
 	}
 	
@@ -42,6 +61,11 @@ public class WatchCanvas extends JComponent {
 		oldY = oY;
 		currX = cX;
 		currY = cY;
+	}
+	
+	public void setArrayList(ArrayList<Integer> x, ArrayList<Integer> y) {
+		xCoords = x;
+		yCoords = y;
 	}
 	
 	public void set5() {

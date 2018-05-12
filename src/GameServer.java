@@ -32,6 +32,7 @@ public class GameServer {
 	private ArrayList<WriteToClient> writeRunnables;
 	private int oldX1, oldY1, currX1, currY1;
 	private int oldX2, oldY2, currX2, currY2;
+	private ArrayList<Integer> xCoords1, yCoords1, xCoords2, yCoords2;
 	private int teamNum;
 	
 	public GameServer() {
@@ -40,6 +41,10 @@ public class GameServer {
 		continueAccepting = true;
 		readRunnables = new ArrayList<ReadFromClient>();
 		writeRunnables = new ArrayList<WriteToClient>();
+		xCoords1 = new ArrayList<Integer>();
+		yCoords1 = new ArrayList<Integer>();
+		xCoords2 = new ArrayList<Integer>();
+		yCoords2 = new ArrayList<Integer>();
 				
 		try {
 			ss = new ServerSocket(45371);
@@ -110,21 +115,40 @@ public class GameServer {
 		public void run() {
 			try {
 				
-				artist1Name = dataIn.readUTF();
-				artist2Name = dataIn.readUTF();
+//				artist1Name = dataIn.readUTF();
+//				artist2Name = dataIn.readUTF();
 				
 				while(true) {
 					if(playerID == artistIndex1) {
-						oldX1 = dataIn.readInt();
-						oldY1 = dataIn.readInt();
-						currX1 = dataIn.readInt();
-						currY1 = dataIn.readInt();
+						int size = dataIn.readInt();
+						for(int i = 0; i < size; i++) {
+							int currX = dataIn.readInt();
+							int currY = dataIn.readInt();
+							xCoords1.add(currX);
+							yCoords1.add(currY);
+						}
+//						oldX1 = dataIn.readInt();
+//						oldY1 = dataIn.readInt();
+//						currX1 = dataIn.readInt();
+//						currY1 = dataIn.readInt();
 					} else if (playerID == artistIndex2) {
-						oldX2 = dataIn.readInt();
-						oldY2 = dataIn.readInt();
-						currX2 = dataIn.readInt();
-						currY2 = dataIn.readInt();
+						int size = dataIn.readInt();
+						for(int i = 0; i < size; i++) {
+							int currX = dataIn.readInt();
+							int currY = dataIn.readInt();
+							xCoords2.add(currX);
+							yCoords2.add(currY);
+						}
+//						oldX2 = dataIn.readInt();
+//						oldY2 = dataIn.readInt();
+//						currX2 = dataIn.readInt();
+//						currY2 = dataIn.readInt();
 					}
+//					try {
+//						Thread.sleep(25);
+//					} catch(InterruptedException ex) {
+//						System.out.println("InterruptedException from WTS run()");
+//					}
 				}
 				
 			} catch(IOException ex) {
@@ -147,7 +171,8 @@ public class GameServer {
 			try {
 				artistIndex1 = 1;
 				artistIndex2 = totalNumPlayers/2 + 1;
-				teamNum = determineTeamNumber();
+//				teamNum = determineTeamNumber();
+				teamNum = 1;
 				dataOut.writeInt(teamNum);
 				if(teamNum == 1)
 					dataOut.writeInt(artistIndex1);
@@ -159,16 +184,41 @@ public class GameServer {
 				System.out.println("Artist2 Num #" + artistIndex2);
 				
 				while(true) {
-					if(teamNum == 1) {
-						dataOut.writeInt(oldX1);
-						dataOut.writeInt(oldY1);
-						dataOut.writeInt(currX1);
-						dataOut.writeInt(currY1);
-					} else {
-						dataOut.writeInt(oldX2);
-						dataOut.writeInt(oldY2);
-						dataOut.writeInt(currX2);
-						dataOut.writeInt(currY2);
+					if(teamNum == 1 && playerID != artistIndex1) {
+						dataOut.writeInt(xCoords1.size());
+//						dataOut.flush();
+						for(int i = 0; i < xCoords1.size(); i++) {
+//							if(yCoords1.size() > 0) {
+								dataOut.writeInt(xCoords1.get(i));
+								dataOut.writeInt(yCoords1.get(i));
+								if(xCoords1.get(i) != 0 && yCoords1.get(i) != 0)
+									System.out.println("ServerFrame: " + xCoords1.get(i) + ", " + yCoords1.get(i));
+//							}
+						}
+						xCoords1 = new ArrayList<Integer>();
+						yCoords1 = new ArrayList<Integer>();
+//						dataOut.flush();
+//						dataOut.writeInt(oldX1);
+//						dataOut.writeInt(oldY1);
+//						dataOut.writeInt(currX1);
+//						dataOut.writeInt(currY1);
+					} else if(teamNum == 2 && playerID != artistIndex2){
+						dataOut.writeInt(xCoords2.size());
+						for(int i = 0; i < xCoords2.size(); i++) {
+//							if(yCoords2.size() > 0) {
+								dataOut.writeInt(xCoords2.get(i));
+								dataOut.writeInt(yCoords2.get(i));
+//							}
+//							System.out.println(xCoords2.get(i));
+//							System.out.println(yCoords2.get(i));
+						}
+						xCoords2 = new ArrayList<Integer>();
+						yCoords2 = new ArrayList<Integer>();
+//						dataOut.flush();
+//						dataOut.writeInt(oldX2);
+//						dataOut.writeInt(oldY2);
+//						dataOut.writeInt(currX2);
+//						dataOut.writeInt(currY2);
 					}
 					try {
 						Thread.sleep(7);
