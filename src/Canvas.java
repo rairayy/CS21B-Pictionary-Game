@@ -8,7 +8,7 @@ public class Canvas extends JComponent {
 	private int currX, currY, oldX, oldY;
 	private float thickness;
 	
-	private boolean mousePressed, mouseDragged;
+	private boolean mousePressed, mouseDragged, mouseReleased;
 	
 	public Canvas() {
 		thickness = 5;
@@ -20,6 +20,11 @@ public class Canvas extends JComponent {
 				mousePressed = true;
 				oldX = e.getX();
 				oldY = e.getY();
+			}
+			
+			public void mouseReleased(MouseEvent e) {
+				mousePressed = false;
+				mouseDragged = false;
 			}
 		});
 		

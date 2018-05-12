@@ -171,7 +171,7 @@ public class GameServer {
 						dataOut.writeInt(currY2);
 					}
 					try {
-						Thread.sleep(5);
+						Thread.sleep(7);
 					} catch(InterruptedException ex) {
 						System.out.println("InterruptedException from WTC run()");
 					}

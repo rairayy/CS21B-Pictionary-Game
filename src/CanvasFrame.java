@@ -29,6 +29,8 @@ public class CanvasFrame extends JFrame {
 	private Socket socket;
 	private int oldX, oldY, currX, currY;
 	
+	private boolean mousePressed, mouseDragged;
+	
 	/**
 	 * 
 	 * Constructor for CanvasFrame()
@@ -46,6 +48,8 @@ public class CanvasFrame extends JFrame {
 		container = this.getContentPane();
 		name = n;
 		ip = i;
+		mousePressed = false;
+		mouseDragged = false;
 	}
 	
 	/**
@@ -95,6 +99,14 @@ public class CanvasFrame extends JFrame {
 		else
 			container.add(watchCanvas, BorderLayout.CENTER);
 		this.setVisible(true);
+	}
+	
+	/*
+	 * AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+	 */
+	public void setMouse() {
+		watchCanvas.setMousePressed(mousePressed);
+		watchCanvas.setMouseDragged(mouseDragged);
 	}
 	
 	/**
@@ -186,10 +198,6 @@ public class CanvasFrame extends JFrame {
 						currX = dataIn.readInt();
 						currY = dataIn.readInt();
 						watchCanvas.setNewCoords(oldX, oldY, currX, currY);
-						watchCanvas.setMousePressed(canvas.getMousePressed());
-						watchCanvas.setMouseDragged(canvas.getMouseDragged());
-//						watchCanvas.setCurrX(currY);
-//						watchCanvas.setCurrY(currX);
 						watchCanvas.repaint();
 					}
 				}
@@ -202,6 +210,7 @@ public class CanvasFrame extends JFrame {
 		public int sendArtistIndex() {
 			return artistIndex;
 		}
+		
 	}
 
 	/**
@@ -232,8 +241,12 @@ public class CanvasFrame extends JFrame {
 					dataOut.writeInt(oldY);
 					dataOut.writeInt(currX);
 					dataOut.writeInt(currY);
+					mousePressed = canvas.getMousePressed();
+					mouseDragged = canvas.getMouseDragged();
+					System.out.println(mousePressed);
+					System.out.println(mouseDragged);
 					try {
-						Thread.sleep(5);
+						Thread.sleep(7);
 					} catch(InterruptedException ex) {
 						System.out.println("InterruptedException from WTS run()");
 					}
