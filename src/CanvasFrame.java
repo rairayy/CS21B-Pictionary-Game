@@ -243,8 +243,8 @@ public class CanvasFrame extends JFrame {
 					dataOut.writeInt(currY);
 					mousePressed = canvas.getMousePressed();
 					mouseDragged = canvas.getMouseDragged();
-					System.out.println(mousePressed);
-					System.out.println(mouseDragged);
+//					System.out.println(mousePressed);
+//					System.out.println(mouseDragged);
 					try {
 						Thread.sleep(7);
 					} catch(InterruptedException ex) {

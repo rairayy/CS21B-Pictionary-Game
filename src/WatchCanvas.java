@@ -12,12 +12,12 @@ public class WatchCanvas extends JComponent {
 	
 	public WatchCanvas() {
 		thickness = 5;
-		setDoubleBuffered(false);
 		mousePressed = false;
 		mouseDragged = false;
 	}
 	
 	protected void paintComponent(Graphics g) {
+		setDoubleBuffered(false);
 		if (image == null) {
 			image = createImage(getSize().width, getSize().height);
 			g2d = (Graphics2D) image.getGraphics();
@@ -25,14 +25,12 @@ public class WatchCanvas extends JComponent {
 			clear();
 		}
 		if ( oldX != 0 && oldY != 0 ) {
-			if ( mousePressed || mouseDragged ) {
-				oldX = currX;
-				oldY = currY;
-				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-				g2d.setStroke(bs);  
-				g2d.drawLine(oldY, oldX, currY, currX);
-				repaint();
-			}
+			oldX = currX;
+			oldY = currY;
+			BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+			g2d.setStroke(bs);  
+			g2d.drawLine(oldY, oldX, currY, currX);
+			repaint();
 		}		
 		g.drawImage(image, 0, 0, null);
 	}
