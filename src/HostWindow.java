@@ -66,6 +66,7 @@ public class HostWindow extends JFrame {
 	public void stopAcceptingConnections() {
 		ActionListener stop = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				closeHostScreen();
 				s.stopAccepting();
 			}
 		};

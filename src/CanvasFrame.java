@@ -29,7 +29,7 @@ public class CanvasFrame extends JFrame {
 	private WriteToServer wtsRunnable;
 	private Socket socket;
 	private int oldX, oldY, currX, currY;
-	
+		
 	private boolean mousePressed, mouseDragged;
 	
 	/**
@@ -95,10 +95,14 @@ public class CanvasFrame extends JFrame {
 	}
 	
 	public void updateVisibility() {
-		if(playerID == artistIndex)
+		if(playerID == artistIndex) {
+			System.out.println("Canvas added");
 			container.add(canvas, BorderLayout.CENTER);
-		else
+		}
+		else {
+			System.out.println("Watch Canvas added");
 			container.add(watchCanvas, BorderLayout.CENTER);
+		}
 		this.setVisible(true);
 	}
 	
@@ -157,8 +161,8 @@ public class CanvasFrame extends JFrame {
 	public void connectToServer() {
     	try {
 			socket = new Socket("localhost", 45371);
-			DataInputStream in = new DataInputStream(socket.getInputStream());
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			playerID = in.readInt();
 			System.out.println("You are player#" + playerID);
 			rfsRunnable = new ReadFromServer(in);
@@ -178,9 +182,9 @@ public class CanvasFrame extends JFrame {
 	 */
 	private class ReadFromServer implements Runnable {
 		
-		private DataInputStream dataIn;
+		private ObjectInputStream dataIn;
 		
-		public ReadFromServer(DataInputStream in) {
+		public ReadFromServer(ObjectInputStream in) {
 			dataIn = in;
 			System.out.println("RFS Runnable created");
 		}
@@ -194,15 +198,20 @@ public class CanvasFrame extends JFrame {
 				System.out.println("Artist Num #" + artistIndex);
 				while(true) {
 					if(artistIndex != playerID && artistIndex != 0) {
-						ArrayList<Integer> xCoords = new ArrayList<Integer>();
-						ArrayList<Integer> yCoords = new ArrayList<Integer>();
-						int size = dataIn.readInt();
+//						ArrayList<Integer> xCoords = new ArrayList<Integer>();
+//						ArrayList<Integer> yCoords = new ArrayList<Integer>();
+						ArrayList<Integer> xCoords = (ArrayList<Integer>) dataIn.readUnshared();
+						ArrayList<Integer> yCoords = (ArrayList<Integer>) dataIn.readUnshared();
+//						int size = dataIn.readInt();
+//						int size = dataIn.readInt();
+						int size = xCoords.size();
+						
 						for(int i = 0; i < size; i++) {
-							int currX = dataIn.readInt();
-							int currY = dataIn.readInt();
+//							int currX = dataIn.readInt();
+//							int currY = dataIn.readInt();
 							if(currX != 0 && currY != 0) {
-								xCoords.add(currX);
-								yCoords.add(currY);
+//								xCoords.add(currX);
+//								yCoords.add(currY);
 								System.out.println("Frame: " + currX + ", " + currY);
 							}
 						}
@@ -226,6 +235,9 @@ public class CanvasFrame extends JFrame {
 				
 			} catch(IOException ex) {
 				System.out.println("IOException from RFS run()");
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -237,9 +249,9 @@ public class CanvasFrame extends JFrame {
 	 */
 	private class WriteToServer implements Runnable {
 		
-		private DataOutputStream dataOut;
+		private ObjectOutputStream dataOut;
 		
-		public WriteToServer(DataOutputStream out) {
+		public WriteToServer(ObjectOutputStream out) {
 			dataOut = out;
 			System.out.println("WTC Runnable created");
 		}
@@ -254,17 +266,21 @@ public class CanvasFrame extends JFrame {
 					if(playerID == artistIndex) {
 						ArrayList<Integer> xCoords = canvas.getXCoords();
 						ArrayList<Integer> yCoords = canvas.getYCoords();
-						dataOut.writeInt(xCoords.size());
+//						dataOut.writeInt(xCoords.size());
 //						dataOut.flush();
-						for(int i = 0; i < xCoords.size(); i++) {
-//							if(xCoords.get(i) != 0 && yCoords.get(i) != 0) {
-								dataOut.writeInt(xCoords.get(i));
-								dataOut.writeInt(yCoords.get(i));
-								if(xCoords.get(i) != 0 && yCoords.get(i) != 0)
-									System.out.println("Artist: " + xCoords.get(i) + ", " + yCoords.get(i));
-//							}
+						if(xCoords.size() > 0) {
+							dataOut.writeUnshared(xCoords);
+							dataOut.writeUnshared(yCoords);
+							for(int i = 0; i < xCoords.size(); i++) {
+	//							if(xCoords.get(i) != 0 && yCoords.get(i) != 0) {
+	//								dataOut.writeInt(xCoords.get(i));
+	//								dataOut.writeInt(yCoords.get(i));
+									if(xCoords.get(i) != 0 && yCoords.get(i) != 0)
+										System.out.println("Artist: " + xCoords.get(i) + ", " + yCoords.get(i));
+	//							}
+							}
+							dataOut.flush();
 						}
-//						dataOut.flush();
 					}
 //					oldX = canvas.getOldX();
 //					oldY = canvas.getOldY();
@@ -279,7 +295,7 @@ public class CanvasFrame extends JFrame {
 //					System.out.println(mousePressed);
 //					System.out.println(mouseDragged);
 					try {
-						Thread.sleep(7);
+						Thread.sleep(5);
 					} catch(InterruptedException ex) {
 						System.out.println("InterruptedException from WTS run()");
 					}

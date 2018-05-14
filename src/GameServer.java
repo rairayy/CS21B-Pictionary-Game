@@ -58,8 +58,8 @@ public class GameServer {
 		try {
 			while(continueAccepting) {
 				Socket s = ss.accept();
-				DataInputStream in = new DataInputStream(s.getInputStream());
-				DataOutputStream out = new DataOutputStream(s.getOutputStream());
+				ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+				ObjectInputStream in = new ObjectInputStream(s.getInputStream());
 				
 				numPlayers++;
 				out.writeInt(numPlayers);
@@ -104,9 +104,9 @@ public class GameServer {
 	
 	private class ReadFromClient implements Runnable {
 		private int playerID;
-		private DataInputStream dataIn;
+		private ObjectInputStream dataIn;
 		
-		public ReadFromClient(int pid, DataInputStream in) {
+		public ReadFromClient(int pid, ObjectInputStream in) {
 			playerID = pid;
 			dataIn = in;
 			System.out.println("RFC" + playerID + " Runnable created");
@@ -120,12 +120,20 @@ public class GameServer {
 				
 				while(true) {
 					if(playerID == artistIndex1) {
-						int size = dataIn.readInt();
-						for(int i = 0; i < size; i++) {
-							int currX = dataIn.readInt();
-							int currY = dataIn.readInt();
-							xCoords1.add(currX);
-							yCoords1.add(currY);
+//						int size = dataIn.readInt();
+						xCoords1 = (ArrayList<Integer>) dataIn.readUnshared();
+						yCoords1 = (ArrayList<Integer>) dataIn.readUnshared();
+						int size = xCoords1.size();
+						
+						for(int i =0 ; i < size; i++) {
+//							int currX = dataIn.readInt();
+//							int currY = dataIn.readInt();
+							int currX = xCoords1.get(i);
+							int currY = yCoords1.get(i);
+//							xCoords1.add(currX);
+//							yCoords1.add(currY);
+							if(currX != 0 && currY != 0)
+								System.out.println("ServerFrameRead: " + currX + ", " + currY);
 						}
 //						oldX1 = dataIn.readInt();
 //						oldY1 = dataIn.readInt();
@@ -153,15 +161,18 @@ public class GameServer {
 				
 			} catch(IOException ex) {
 				System.out.println("IOException from RFC run()");
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}		
 	}
 	
 	private class WriteToClient implements Runnable {
 		private int playerID;
-		private DataOutputStream dataOut;
+		private ObjectOutputStream dataOut;
 		
-		public WriteToClient(int pid, DataOutputStream out) {
+		public WriteToClient(int pid, ObjectOutputStream out) {
 			playerID = pid;
 			dataOut = out;
 			System.out.println("WTC" + playerID + " Runnable created");
@@ -185,19 +196,26 @@ public class GameServer {
 				
 				while(true) {
 					if(teamNum == 1 && playerID != artistIndex1) {
-						dataOut.writeInt(xCoords1.size());
+//						dataOut.writeInt(xCoords1.size());
+//						dataOut.writeBoolean(xCoo);
 //						dataOut.flush();
-						for(int i = 0; i < xCoords1.size(); i++) {
-//							if(yCoords1.size() > 0) {
-								dataOut.writeInt(xCoords1.get(i));
-								dataOut.writeInt(yCoords1.get(i));
-								if(xCoords1.get(i) != 0 && yCoords1.get(i) != 0)
-									System.out.println("ServerFrame: " + xCoords1.get(i) + ", " + yCoords1.get(i));
-//							}
+						if(xCoords1.size() > 0) {
+							dataOut.writeUnshared(xCoords1);
+							dataOut.writeUnshared(yCoords1);
+							for(int i = 0; i < xCoords1.size(); i++) {
+	//							if(yCoords1.size() > 0) {
+	//								dataOut.writeInt(xCoords1.get(i));
+	//								dataOut.writeInt(yCoords1.get(i));
+									if(xCoords1.get(i) != 0 && yCoords1.get(i) != 0)
+										System.out.println("ServerFrameWrite: " + xCoords1.get(i) + ", " + yCoords1.get(i));
+	//							}
+	//								dataOut.writeBoolean(true);
+							}
+							dataOut.flush();
 						}
+//						dataOut.writeBoolean(false);
 						xCoords1 = new ArrayList<Integer>();
 						yCoords1 = new ArrayList<Integer>();
-//						dataOut.flush();
 //						dataOut.writeInt(oldX1);
 //						dataOut.writeInt(oldY1);
 //						dataOut.writeInt(currX1);
@@ -221,7 +239,7 @@ public class GameServer {
 //						dataOut.writeInt(currY2);
 					}
 					try {
-						Thread.sleep(7);
+						Thread.sleep(5);
 					} catch(InterruptedException ex) {
 						System.out.println("InterruptedException from WTC run()");
 					}

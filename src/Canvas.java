@@ -38,19 +38,20 @@ public class Canvas extends JComponent {
 		
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
+				System.out.println("draggign");
 				mouseDragged = true;
 				currX = e.getX();
 				currY = e.getY();
-				if(currX != 0 && currY != 0) {
-					xCoords.add(currX);
-					yCoords.add(currY);
-				}
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 			    g2d.setStroke(bs);  
 			    g2d.drawLine(oldX, oldY, currX, currY);
 				repaint();
 				oldX = currX;
 				oldY = currY;
+				if(currX != 0 && currY != 0) {
+					xCoords.add(currX);
+					yCoords.add(currY);
+				}
 			}
 		});
 	}

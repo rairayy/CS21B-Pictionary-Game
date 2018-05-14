@@ -71,11 +71,11 @@ public class JoinWindow extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				ip = inputIPAddress.getText();
 				name = inputName.getText();
+				closeOpeningScreen();
 				CanvasFrame cf = new CanvasFrame(800, 640, name, ip);
 				cf.connectToServer();
 				cf.setUpFrame();
 				cf.setUpButtons();
-				closeOpeningScreen();
 			}
 		};
 		joinGame.addActionListener(getIP);

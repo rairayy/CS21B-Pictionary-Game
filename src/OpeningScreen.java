@@ -67,8 +67,13 @@ public class OpeningScreen extends JFrame {
 	public void hostButton() {
 		ActionListener host = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-					HostWindow hw = new HostWindow(300,200);
-					hw.setUpHostWindow();
+					Thread t = new Thread(new Runnable() {
+						public void run() {
+							HostWindow hw = new HostWindow(300,200);
+							hw.setUpHostWindow();
+						}
+					});
+					t.start();
 			}
 		};
 		hostGame.addActionListener(host);
