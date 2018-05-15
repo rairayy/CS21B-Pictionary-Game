@@ -21,7 +21,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+/**
+ * Class for the game's server
+ */
 public class GameServer {
+	
 	private ServerSocket ss;
 	private int numPlayers, totalNumPlayers;
 	private boolean continueAccepting;
@@ -32,20 +36,30 @@ public class GameServer {
 	private ArrayList<WriteToClient> writeRunnables;
 	private int oldX1, oldY1, currX1, currY1;
 	private int oldX2, oldY2, currX2, currY2;
-	private ArrayList<Integer> xCoords1, yCoords1, xCoords2, yCoords2;
+	private String xCoords1, yCoords1, xCoords2, yCoords2;
+	
+	private String xyCoords1;
+	
 	private int teamNum;
 	
+	/**
+	 * Constructor for class GameServer
+	 */
 	public GameServer() {
 		System.out.println("==== GAME SERVER ====");
 		numPlayers = 0;
 		continueAccepting = true;
 		readRunnables = new ArrayList<ReadFromClient>();
 		writeRunnables = new ArrayList<WriteToClient>();
-		xCoords1 = new ArrayList<Integer>();
-		yCoords1 = new ArrayList<Integer>();
-		xCoords2 = new ArrayList<Integer>();
-		yCoords2 = new ArrayList<Integer>();
-				
+		xyCoords1 = "";
+		xCoords1 = "";
+		yCoords1 = "";
+		xCoords2 = "";
+		yCoords2 = "";
+//		xCoords1 = new ArrayList<Integer>();
+//		yCoords1 = new ArrayList<Integer>();
+//		xCoords2 = new ArrayList<Integer>();
+//		yCoords2 = new ArrayList<Integer>();
 		try {
 			ss = new ServerSocket(45371);
 		} catch(IOException ex) {
@@ -53,6 +67,9 @@ public class GameServer {
 		}
 	}
 	
+	/**
+	 * Accepts connections
+	 */
 	public void acceptConnections() {
 		System.out.println("Waiting for connections...");
 		try {
@@ -76,7 +93,7 @@ public class GameServer {
 		}
 		
 		totalNumPlayers = numPlayers;
-		System.out.println("Total:" + totalNumPlayers);
+		System.out.println("Total: " + totalNumPlayers);
 		
 		for(WriteToClient currRFC : writeRunnables) {
 			Thread writeThread = new Thread(currRFC);
@@ -121,32 +138,33 @@ public class GameServer {
 				while(true) {
 					if(playerID == artistIndex1) {
 //						int size = dataIn.readInt();
-						xCoords1 = (ArrayList<Integer>) dataIn.readUnshared();
-						yCoords1 = (ArrayList<Integer>) dataIn.readUnshared();
-						int size = xCoords1.size();
+						xyCoords1 = (String) dataIn.readUnshared();
+//						xCoords1 = (String) dataIn.readUnshared();
+//						yCoords1 = (String) dataIn.readUnshared();
+//						int size = xCoords1.length();
 						
-						for(int i =0 ; i < size; i++) {
-//							int currX = dataIn.readInt();
-//							int currY = dataIn.readInt();
-							int currX = xCoords1.get(i);
-							int currY = yCoords1.get(i);
-//							xCoords1.add(currX);
-//							yCoords1.add(currY);
-							if(currX != 0 && currY != 0)
-								System.out.println("ServerFrameRead: " + currX + ", " + currY);
-						}
+//						for(int i =0 ; i < size; i++) {
+////							int currX = dataIn.readInt();
+////							int currY = dataIn.readInt();
+//							int currX = xCoords1.get(i);
+//							int currY = yCoords1.get(i);
+////							xCoords1.add(currX);
+////							yCoords1.add(currY);
+//							if(currX != 0 && currY != 0)
+//								System.out.println("ServerFrameRead: " + currX + ", " + currY);
+//						}
 //						oldX1 = dataIn.readInt();
 //						oldY1 = dataIn.readInt();
 //						currX1 = dataIn.readInt();
 //						currY1 = dataIn.readInt();
 					} else if (playerID == artistIndex2) {
-						int size = dataIn.readInt();
-						for(int i = 0; i < size; i++) {
-							int currX = dataIn.readInt();
-							int currY = dataIn.readInt();
-							xCoords2.add(currX);
-							yCoords2.add(currY);
-						}
+//						int size = dataIn.readInt();
+//						for(int i = 0; i < size; i++) {
+//							int currX = dataIn.readInt();
+//							int currY = dataIn.readInt();
+//							xCoords2.add(currX);
+//							yCoords2.add(currY);
+//						}
 //						oldX2 = dataIn.readInt();
 //						oldY2 = dataIn.readInt();
 //						currX2 = dataIn.readInt();
@@ -162,7 +180,6 @@ public class GameServer {
 			} catch(IOException ex) {
 				System.out.println("IOException from RFC run()");
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}		
@@ -199,39 +216,42 @@ public class GameServer {
 //						dataOut.writeInt(xCoords1.size());
 //						dataOut.writeBoolean(xCoo);
 //						dataOut.flush();
-						if(xCoords1.size() > 0) {
-							dataOut.writeUnshared(xCoords1);
-							dataOut.writeUnshared(yCoords1);
-							for(int i = 0; i < xCoords1.size(); i++) {
-	//							if(yCoords1.size() > 0) {
-	//								dataOut.writeInt(xCoords1.get(i));
-	//								dataOut.writeInt(yCoords1.get(i));
-									if(xCoords1.get(i) != 0 && yCoords1.get(i) != 0)
-										System.out.println("ServerFrameWrite: " + xCoords1.get(i) + ", " + yCoords1.get(i));
-	//							}
-	//								dataOut.writeBoolean(true);
-							}
-							dataOut.flush();
-						}
-//						dataOut.writeBoolean(false);
-						xCoords1 = new ArrayList<Integer>();
-						yCoords1 = new ArrayList<Integer>();
-//						dataOut.writeInt(oldX1);
-//						dataOut.writeInt(oldY1);
-//						dataOut.writeInt(currX1);
-//						dataOut.writeInt(currY1);
-					} else if(teamNum == 2 && playerID != artistIndex2){
-						dataOut.writeInt(xCoords2.size());
-						for(int i = 0; i < xCoords2.size(); i++) {
-//							if(yCoords2.size() > 0) {
-								dataOut.writeInt(xCoords2.get(i));
-								dataOut.writeInt(yCoords2.get(i));
-//							}
-//							System.out.println(xCoords2.get(i));
-//							System.out.println(yCoords2.get(i));
-						}
-						xCoords2 = new ArrayList<Integer>();
-						yCoords2 = new ArrayList<Integer>();
+//						dataOut.writeUnshared(xCoords1);
+//						dataOut.writeUnshared(yCoords1);
+						dataOut.writeUnshared(xyCoords1);
+//						if(xCoords1.size() > 0) {
+//							dataOut.writeUnshared(xCoords1);
+//							dataOut.writeUnshared(yCoords1);
+////							for(int i = 0; i < xCoords1.size(); i++) {
+////	//							if(yCoords1.size() > 0) {
+////	//								dataOut.writeInt(xCoords1.get(i));
+////	//								dataOut.writeInt(yCoords1.get(i));
+////									if(xCoords1.get(i) != 0 && yCoords1.get(i) != 0)
+////										System.out.println("ServerFrameWrite: " + xCoords1.get(i) + ", " + yCoords1.get(i));
+////	//							}
+////	//								dataOut.writeBoolean(true);
+////							}
+////							dataOut.flush();
+//						}
+////						dataOut.writeBoolean(false);
+//						xCoords1 = new ArrayList<Integer>();
+//						yCoords1 = new ArrayList<Integer>();
+////						dataOut.writeInt(oldX1);
+////						dataOut.writeInt(oldY1);
+////						dataOut.writeInt(currX1);
+////						dataOut.writeInt(currY1);
+//					} else if(teamNum == 2 && playerID != artistIndex2){
+//						dataOut.writeInt(xCoords2.size());
+//						for(int i = 0; i < xCoords2.size(); i++) {
+////							if(yCoords2.size() > 0) {
+//								dataOut.writeInt(xCoords2.get(i));
+//								dataOut.writeInt(yCoords2.get(i));
+////							}
+////							System.out.println(xCoords2.get(i));
+////							System.out.println(yCoords2.get(i));
+//						}
+//						xCoords2 = new ArrayList<Integer>();
+//						yCoords2 = new ArrayList<Integer>();
 //						dataOut.flush();
 //						dataOut.writeInt(oldX2);
 //						dataOut.writeInt(oldY2);

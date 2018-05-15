@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 
@@ -11,15 +12,17 @@ public class WatchCanvas extends JComponent {
 	private float thickness;
 	
 	private boolean mousePressed, mouseDragged;
-	private ArrayList<Integer> xCoords, yCoords;
+	private String xCoords, yCoords;
 	
 	public WatchCanvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
 		mousePressed = false;
 		mouseDragged = false;
-		xCoords = new ArrayList<Integer>();
-		yCoords = new ArrayList<Integer>();
+//		xCoords = new ArrayList<Integer>();
+//		yCoords = new ArrayList<Integer>();
+		xCoords = "";
+		yCoords = "";
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -28,6 +31,8 @@ public class WatchCanvas extends JComponent {
 			g2d = (Graphics2D) image.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
+		} else {
+			parseCoordinates(xCoords, yCoords, g2d);
 		}
 //		if ( oldX != 0 && oldY != 0 ) {
 //			if ( !mousePressed || mouseDragged ) {
@@ -45,13 +50,7 @@ public class WatchCanvas extends JComponent {
 //				System.out.println("Canvas SizeX:" + xCoords.size());
 //				System.out.println("Canvas SizeY:" + yCoords.size());
 //			}
-			for(int i = 0; i < xCoords.size()-1; i++) {
-//				System.out.println("Canvas: " + xCoords.get(i+1) + ", " + yCoords.get(i+1));
-				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-				g2d.setStroke(bs);  
-				g2d.drawLine(xCoords.get(i), yCoords.get(i), xCoords.get(i+1), yCoords.get(i+1));
-				repaint();
-			}
+			
 //		}		
 		g.drawImage(image, 0, 0, null);
 	}
@@ -63,7 +62,40 @@ public class WatchCanvas extends JComponent {
 		currY = cY;
 	}
 	
-	public void setArrayList(ArrayList<Integer> x, ArrayList<Integer> y) {
+	public void receiveCoords( String z ) {
+		if ( z.length() > 6 ) {
+//			String x = z.substring(1, z.length()/2-1);
+//			String y = z.substring(z.length()/2+2, z.length()-1);
+//			if (x.length() > 2 && y.length() > 2) {
+			
+			String[] zA = z.split(Pattern.quote("]["));
+			String x = zA[0].substring(1, zA[0].length());
+			String y = zA[1].substring(0, zA[1].length()-1);
+			xCoords = x;
+			yCoords = y;
+			System.out.println("X: " + x);
+			System.out.println("--------");
+			System.out.println("Y: " + y);
+		}
+	}
+	
+	public void parseCoordinates( String x, String y, Graphics2D g2d) {
+		if (x.length() > 2 && y.length() > 2) {
+//			x = x.substring(1, x.length()-1);
+//			y = y.substring(1, y.length()-1);
+			String[] xCoordsA = x.split(", ");
+			String[] yCoordsA = y.split(", ");
+//			System.out.println("x length: " + x.length());
+//			System.out.println("y length: " + y.length());
+			for(int i = 0; i < xCoordsA.length-1; i++) {
+				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+				g2d.setStroke(bs);  
+				g2d.drawLine(Integer.parseInt(xCoordsA[i]), Integer.parseInt(yCoordsA[i]), Integer.parseInt(xCoordsA[i+1]), Integer.parseInt(yCoordsA[i+1]));
+			}
+		}
+	}
+	
+	public void setArrayList(String x, String y) {
 		xCoords = x;
 		yCoords = y;
 	}

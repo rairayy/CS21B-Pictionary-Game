@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Class for setting up the CanvasFrame. Extends JFrame.
@@ -200,24 +201,28 @@ public class CanvasFrame extends JFrame {
 					if(artistIndex != playerID && artistIndex != 0) {
 //						ArrayList<Integer> xCoords = new ArrayList<Integer>();
 //						ArrayList<Integer> yCoords = new ArrayList<Integer>();
-						ArrayList<Integer> xCoords = (ArrayList<Integer>) dataIn.readUnshared();
-						ArrayList<Integer> yCoords = (ArrayList<Integer>) dataIn.readUnshared();
+						String xyCoords = (String) dataIn.readUnshared();
+//						String xCoords = (String) dataIn.readUnshared();
+//						String yCoords = (String) dataIn.readUnshared();
+//						ArrayList<Integer> xCoords = (ArrayList<Integer>) dataIn.readUnshared();
+//						ArrayList<Integer> yCoords = (ArrayList<Integer>) dataIn.readUnshared();
 //						int size = dataIn.readInt();
 //						int size = dataIn.readInt();
-						int size = xCoords.size();
-						
-						for(int i = 0; i < size; i++) {
-//							int currX = dataIn.readInt();
-//							int currY = dataIn.readInt();
-							if(currX != 0 && currY != 0) {
-//								xCoords.add(currX);
-//								yCoords.add(currY);
-								System.out.println("Frame: " + currX + ", " + currY);
-							}
-						}
+//						int size = xCoords.size();
+//						
+//						for(int i = 0; i < size; i++) {
+////							int currX = dataIn.readInt();
+////							int currY = dataIn.readInt();
+//							if(currX != 0 && currY != 0) {
+////								xCoords.add(currX);
+////								yCoords.add(currY);
+//								System.out.println("Frame: " + currX + ", " + currY);
+//							}
+//						}
 //						if(yCoords.size() > 0)
 //							System.out.println("CanvasFrame Size:" + yCoords.size());
-						watchCanvas.setArrayList(xCoords, yCoords);
+						watchCanvas.receiveCoords(xyCoords);
+//						watchCanvas.setArrayList(xCoords, yCoords);
 //						oldX = dataIn.readInt();
 //						System.out.println(xCoords.get(i+1) + yCoords.get(i+1));
 //						oldY = dataIn.readInt();
@@ -266,19 +271,28 @@ public class CanvasFrame extends JFrame {
 					if(playerID == artistIndex) {
 						ArrayList<Integer> xCoords = canvas.getXCoords();
 						ArrayList<Integer> yCoords = canvas.getYCoords();
+						CopyOnWriteArrayList<Integer> xCoords2 = new CopyOnWriteArrayList<Integer>(xCoords);
+						CopyOnWriteArrayList<Integer> yCoords2 = new CopyOnWriteArrayList<Integer>(yCoords);
+						String x = xCoords2.toString();
+						String y = yCoords2.toString();
+						String z = x+y;
+						System.out.println("Z: " + z);
 //						dataOut.writeInt(xCoords.size());
 //						dataOut.flush();
 						if(xCoords.size() > 0) {
-							dataOut.writeUnshared(xCoords);
-							dataOut.writeUnshared(yCoords);
-							for(int i = 0; i < xCoords.size(); i++) {
-	//							if(xCoords.get(i) != 0 && yCoords.get(i) != 0) {
-	//								dataOut.writeInt(xCoords.get(i));
-	//								dataOut.writeInt(yCoords.get(i));
-									if(xCoords.get(i) != 0 && yCoords.get(i) != 0)
-										System.out.println("Artist: " + xCoords.get(i) + ", " + yCoords.get(i));
-	//							}
-							}
+//							System.out.println(xCoords.toString());
+//							System.out.println(yCoords.toString());
+//							dataOut.writeUnshared(y);
+//							dataOut.writeUnshared(x);
+							dataOut.writeUnshared(z);
+//							for(int i = 0; i < xCoords.size(); i++) {
+//	//							if(xCoords.get(i) != 0 && yCoords.get(i) != 0) {
+//	//								dataOut.writeInt(xCoords.get(i));
+//	//								dataOut.writeInt(yCoords.get(i));
+//									if(xCoords.get(i) != 0 && yCoords.get(i) != 0)
+//										System.out.println("Artist: " + xCoords.get(i) + ", " + yCoords.get(i));
+//	//							}
+//							}
 							dataOut.flush();
 						}
 					}

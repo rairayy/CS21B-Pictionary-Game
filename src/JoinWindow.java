@@ -42,6 +42,7 @@ public class JoinWindow extends JFrame {
 	public void setUpJoinWindow() {
 		this.setSize(300,200);
 		this.setTitle("Join Window");
+		inputIPAddress.setText("localhost");
 		container.setLayout(new GridLayout(3,1));
 		ipPanel.add(ipLabel);
 		ipPanel.add(inputIPAddress);
@@ -58,7 +59,7 @@ public class JoinWindow extends JFrame {
 	/**
 	 * Closes the join window. 
 	 */
-	public void closeOpeningScreen() {
+	public void closeJoinScreen() {
 		 this.setVisible(false);
 		 this.dispose();
 	}
@@ -71,7 +72,7 @@ public class JoinWindow extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				ip = inputIPAddress.getText();
 				name = inputName.getText();
-				closeOpeningScreen();
+				closeJoinScreen();
 				CanvasFrame cf = new CanvasFrame(800, 640, name, ip);
 				cf.connectToServer();
 				cf.setUpFrame();

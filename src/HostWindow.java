@@ -71,7 +71,6 @@ public class HostWindow extends JFrame {
 			}
 		};
 		stopAccepting.addActionListener(stop);
-		
 	}
 	
 	public void closeHostScreen() {

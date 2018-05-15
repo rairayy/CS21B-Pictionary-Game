@@ -101,7 +101,6 @@ public class OpeningScreen extends JFrame {
 		 this.dispose();
 	}
 	
-	
 	/**
 	 * Main method
 	 * 

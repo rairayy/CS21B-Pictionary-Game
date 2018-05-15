@@ -31,8 +31,10 @@ public class Canvas extends JComponent {
 			public void mouseReleased(MouseEvent e) {
 				mousePressed = false;
 				mouseDragged = false;
-				xCoords = new ArrayList<Integer>();
-				yCoords = new ArrayList<Integer>();
+				xCoords.clear();
+				yCoords.clear();
+//				xCoords = new ArrayList<Integer>();
+//				yCoords = new ArrayList<Integer>();
 			}
 		});
 		
@@ -48,10 +50,10 @@ public class Canvas extends JComponent {
 				repaint();
 				oldX = currX;
 				oldY = currY;
-				if(currX != 0 && currY != 0) {
+//				if(currX != 0 && currY != 0) {
 					xCoords.add(currX);
 					yCoords.add(currY);
-				}
+//				}
 			}
 		});
 	}
