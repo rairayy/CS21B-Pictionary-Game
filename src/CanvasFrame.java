@@ -31,8 +31,6 @@ public class CanvasFrame extends JFrame {
 	private Socket socket;
 	private int oldX, oldY, currX, currY;
 		
-	private boolean mousePressed, mouseDragged;
-	
 	/**
 	 * 
 	 * Constructor for CanvasFrame()
@@ -50,8 +48,6 @@ public class CanvasFrame extends JFrame {
 		container = this.getContentPane();
 		name = n;
 		ip = i;
-		mousePressed = false;
-		mouseDragged = false;
 	}
 	
 	/**
@@ -88,10 +84,6 @@ public class CanvasFrame extends JFrame {
 		buttonPanel.add(eraser);
 		buttonPanel.add(clear);
 		container.add(buttonPanel, BorderLayout.SOUTH);
-//		WaitingScreen ws = new WaitingScreen();
-//		ws.setUpGUI();
-//		ws.setVisible(true);
-//		this.setVisible(true);
 		this.getContentPane().setBackground(Color.WHITE);
 	}
 	
@@ -105,14 +97,6 @@ public class CanvasFrame extends JFrame {
 			container.add(watchCanvas, BorderLayout.CENTER);
 		}
 		this.setVisible(true);
-	}
-	
-	/*
-	 * AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-	 */
-	public void setMouse() {
-		watchCanvas.setMousePressed(mousePressed);
-		watchCanvas.setMouseDragged(mouseDragged);
 	}
 	
 	/**
@@ -178,18 +162,25 @@ public class CanvasFrame extends JFrame {
     }
 	
 	/**
-	 * Inner class that reads from the server
-	 * Implements Runnable
+	 * Inner class that reads from the server. Implements Runnable.
 	 */
 	private class ReadFromServer implements Runnable {
 		
 		private ObjectInputStream dataIn;
 		
+		/**
+		 * Constructor for class ReadFromServer.
+		 * 
+		 * @param in ObjectInputStream object.
+		 */
 		public ReadFromServer(ObjectInputStream in) {
 			dataIn = in;
 			System.out.println("RFS Runnable created");
 		}
 		
+		/**
+		 * Method that runs ReadFromServer.
+		 */
 		public void run() {
 			try {
 				teamNum = dataIn.readInt();
@@ -199,74 +190,41 @@ public class CanvasFrame extends JFrame {
 				System.out.println("Artist Num #" + artistIndex);
 				while(true) {
 					if(artistIndex != playerID && artistIndex != 0) {
-//						ArrayList<Integer> xCoords = new ArrayList<Integer>();
-//						ArrayList<Integer> yCoords = new ArrayList<Integer>();
 						String xyCoords = (String) dataIn.readUnshared();
-//						String xCoords = (String) dataIn.readUnshared();
-//						String yCoords = (String) dataIn.readUnshared();
-//						ArrayList<Integer> xCoords = (ArrayList<Integer>) dataIn.readUnshared();
-//						ArrayList<Integer> yCoords = (ArrayList<Integer>) dataIn.readUnshared();
-//						int size = dataIn.readInt();
-//						int size = dataIn.readInt();
-//						int size = xCoords.size();
-//						
-//						for(int i = 0; i < size; i++) {
-////							int currX = dataIn.readInt();
-////							int currY = dataIn.readInt();
-//							if(currX != 0 && currY != 0) {
-////								xCoords.add(currX);
-////								yCoords.add(currY);
-//								System.out.println("Frame: " + currX + ", " + currY);
-//							}
-//						}
-//						if(yCoords.size() > 0)
-//							System.out.println("CanvasFrame Size:" + yCoords.size());
 						watchCanvas.receiveCoords(xyCoords);
-//						watchCanvas.setArrayList(xCoords, yCoords);
-//						oldX = dataIn.readInt();
-//						System.out.println(xCoords.get(i+1) + yCoords.get(i+1));
-//						oldY = dataIn.readInt();
-//						currX = dataIn.readInt();
-//						currY = dataIn.readInt();
-//						watchCanvas.setNewCoords(oldX, oldY, currX, currY);
 						watchCanvas.repaint();
 					}
-//					try {
-//						Thread.sleep(25);
-//					} catch(InterruptedException ex) {
-//						System.out.println("InterruptedException from WTC run()");
-//					}
 				}
-				
 			} catch(IOException ex) {
 				System.out.println("IOException from RFS run()");
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
 	}
 
 	/**
-	 * Class that writes to the server
-	 * Implements Runnable 
+	 * Class that writes to the server. Implements Runnable.
 	 */
 	private class WriteToServer implements Runnable {
 		
 		private ObjectOutputStream dataOut;
 		
+		/**
+		 * Constructor for class WriteToServer.
+		 * 
+		 * @param out ObjectOutputStream object.
+		 */
 		public WriteToServer(ObjectOutputStream out) {
 			dataOut = out;
 			System.out.println("WTC Runnable created");
 		}
 		
+		/**
+		 * Method that runs WriteToServer.
+		 */
 		public void run() {
 			try {
-//				if(playerID == artistIndex)
-//					dataOut.writeUTF(name);
-//				dataOut.flush();
-				
 				while(true) {
 					if(playerID == artistIndex) {
 						ArrayList<Integer> xCoords = canvas.getXCoords();
@@ -276,38 +234,11 @@ public class CanvasFrame extends JFrame {
 						String x = xCoords2.toString();
 						String y = yCoords2.toString();
 						String z = x+y;
-						System.out.println("Z: " + z);
-//						dataOut.writeInt(xCoords.size());
-//						dataOut.flush();
 						if(xCoords.size() > 0) {
-//							System.out.println(xCoords.toString());
-//							System.out.println(yCoords.toString());
-//							dataOut.writeUnshared(y);
-//							dataOut.writeUnshared(x);
 							dataOut.writeUnshared(z);
-//							for(int i = 0; i < xCoords.size(); i++) {
-//	//							if(xCoords.get(i) != 0 && yCoords.get(i) != 0) {
-//	//								dataOut.writeInt(xCoords.get(i));
-//	//								dataOut.writeInt(yCoords.get(i));
-//									if(xCoords.get(i) != 0 && yCoords.get(i) != 0)
-//										System.out.println("Artist: " + xCoords.get(i) + ", " + yCoords.get(i));
-//	//							}
-//							}
 							dataOut.flush();
 						}
 					}
-//					oldX = canvas.getOldX();
-//					oldY = canvas.getOldY();
-//					currX = canvas.getCurrX();
-//					currY = canvas.getCurrY();
-//					dataOut.writeInt(oldX);
-//					dataOut.writeInt(oldY);
-//					dataOut.writeInt(currX);
-//					dataOut.writeInt(currY);
-//					mousePressed = canvas.getMousePressed();
-//					mouseDragged = canvas.getMouseDragged();
-//					System.out.println(mousePressed);
-//					System.out.println(mouseDragged);
 					try {
 						Thread.sleep(5);
 					} catch(InterruptedException ex) {
@@ -322,7 +253,7 @@ public class CanvasFrame extends JFrame {
 	}
 	
 	/**
-	 * Main method
+	 * Main method.
 	 * 
 	 * @param args
 	 */

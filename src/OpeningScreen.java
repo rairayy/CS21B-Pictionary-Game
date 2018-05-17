@@ -45,7 +45,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * Sets up the opening screen.
+	 * Method that sets up the opening screen.
 	 */
 	public void setUpOpeningScreen() {
 		this.setSize(width, height);
@@ -62,7 +62,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * Sets up the Host Game button.
+	 * Method that sets up the Host Game button.
 	 */
 	public void hostButton() {
 		ActionListener host = new ActionListener() {
@@ -80,7 +80,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * Sets up the Join Game button.
+	 * Method that sets up the Join Game button.
 	 */
 	public void joinButton() {
 		ActionListener join = new ActionListener() {
@@ -94,7 +94,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * Closes the opening screen. 
+	 * Method that closes the opening screen. 
 	 */
 	public void closeOpeningScreen() {
 		 this.setVisible(false);
@@ -102,7 +102,7 @@ public class OpeningScreen extends JFrame {
 	}
 	
 	/**
-	 * Main method
+	 * Main method.
 	 * 
 	 * @param args
 	 */

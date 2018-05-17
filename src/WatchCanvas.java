@@ -5,26 +5,29 @@ import java.util.regex.Pattern;
 
 import javax.swing.*;
 
+/**
+ * Class for the non-artist canvas.
+ * This is where the drawing of the artist is reflected on the screen of the non-artists.
+ */
 public class WatchCanvas extends JComponent {
 	private Image image;
 	private Graphics2D g2d;
-	private int currX, currY, oldX, oldY;
 	private float thickness;
-	
-	private boolean mousePressed, mouseDragged;
 	private String xCoords, yCoords;
 	
+	/**
+	 * Constructor for class WatchCanvas.
+	 */
 	public WatchCanvas() {
 		thickness = 5;
 		setDoubleBuffered(false);
-		mousePressed = false;
-		mouseDragged = false;
-//		xCoords = new ArrayList<Integer>();
-//		yCoords = new ArrayList<Integer>();
 		xCoords = "";
 		yCoords = "";
 	}
 	
+	/**
+	 * Overrides paintComponent.
+	 */
 	protected void paintComponent(Graphics g) {
 		if (image == null) {
 			image = createImage(getSize().width, getSize().height);
@@ -34,59 +37,37 @@ public class WatchCanvas extends JComponent {
 		} else {
 			parseCoordinates(xCoords, yCoords, g2d);
 		}
-//		if ( oldX != 0 && oldY != 0 ) {
-//			if ( !mousePressed || mouseDragged ) {
-//				oldX = currX;
-//				oldY = currY;
-//				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-//				g2d.setStroke(bs);  
-//				g2d.drawLine(oldY, oldX, currY, currX);
-//				repaint();
-//			}
-//			System.out.println(xCoords.size());
-			
-			// DOESNT WORK
-//			if(xCoords.size() > 0) {
-//				System.out.println("Canvas SizeX:" + xCoords.size());
-//				System.out.println("Canvas SizeY:" + yCoords.size());
-//			}
-			
-//		}		
 		g.drawImage(image, 0, 0, null);
 	}
 	
-	public void setNewCoords(int oX, int oY, int cX, int cY) {		
-		oldX = oX;
-		oldY = oY;
-		currX = cX;
-		currY = cY;
-	}
-	
+	/**
+	 * 
+	 * Method that receives the coordinates as a string, and splits them into the string containing the x-coordinates and the string containing the y-coordinates.
+	 * 
+	 * @param z String of coordinates.
+	 */
 	public void receiveCoords( String z ) {
 		if ( z.length() > 6 ) {
-//			String x = z.substring(1, z.length()/2-1);
-//			String y = z.substring(z.length()/2+2, z.length()-1);
-//			if (x.length() > 2 && y.length() > 2) {
-			
 			String[] zA = z.split(Pattern.quote("]["));
 			String x = zA[0].substring(1, zA[0].length());
 			String y = zA[1].substring(0, zA[1].length()-1);
 			xCoords = x;
 			yCoords = y;
-			System.out.println("X: " + x);
-			System.out.println("--------");
-			System.out.println("Y: " + y);
 		}
 	}
 	
+	/**
+	 * 
+	 * Method that parses the string coordinates into integers to form the lines.
+	 * 
+	 * @param x String of x-coordinates.
+	 * @param y String of y-coordinates.
+	 * @param g2d Graphics object.
+	 */
 	public void parseCoordinates( String x, String y, Graphics2D g2d) {
 		if (x.length() > 2 && y.length() > 2) {
-//			x = x.substring(1, x.length()-1);
-//			y = y.substring(1, y.length()-1);
 			String[] xCoordsA = x.split(", ");
 			String[] yCoordsA = y.split(", ");
-//			System.out.println("x length: " + x.length());
-//			System.out.println("y length: " + y.length());
 			for(int i = 0; i < xCoordsA.length-1; i++) {
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 				g2d.setStroke(bs);  
@@ -95,23 +76,30 @@ public class WatchCanvas extends JComponent {
 		}
 	}
 	
-	public void setArrayList(String x, String y) {
-		xCoords = x;
-		yCoords = y;
-	}
-	
+	/**
+	 * Method that sets brush thickness to 5.
+	 */
 	public void set5() {
 		thickness = 5;
 	}
 	
+	/**
+	 * Method that sets brush thickness to 10.
+	 */
 	public void set10() {
 		thickness = 10;
 	}
 	
+	/**
+	 * Method that sets brush thickness to 20.
+	 */
 	public void set20() {
 		thickness = 20;
 	}
 	
+	/**
+	 * Method that clears the canvas.
+	 */
 	public void clear() {
 		g2d.setPaint(Color.WHITE);
 		g2d.fillRect(0, 0, getSize().width, getSize().height);
@@ -119,35 +107,45 @@ public class WatchCanvas extends JComponent {
 		repaint();
 	}
 	
+	/**
+	 * Method that sets paint color to black.
+	 */
 	public void black() {
 		g2d.setPaint(Color.BLACK);
 	}
 	
+	/**
+	 * Method that sets paint color to red.
+	 */
 	public void red() {
 		g2d.setPaint(Color.RED);
 	}
 
+	/**
+	 * Method that sets paint color to blue.
+	 */
 	public void blue() {
 		g2d.setPaint(Color.BLUE);
 	}
 	
+	/**
+	 * Method that sets paint color to yellow.
+	 */
 	public void yellow() {
 		g2d.setPaint(Color.YELLOW);
 	}
 	
+	/**
+	 * Method that sets paint color to green.
+	 */
 	public void green() {
 		g2d.setPaint(Color.GREEN);
 	}
 	
+	/**
+	 * Method that activates the eraser.
+	 */
 	public void eraser() {
 		g2d.setPaint(Color.WHITE);
-	}
-	
-	public void setMousePressed( boolean mp ) {
-		mousePressed = mp;
-	}
-	
-	public void setMouseDragged( boolean md ) {
-		mouseDragged = md;
 	}
 }

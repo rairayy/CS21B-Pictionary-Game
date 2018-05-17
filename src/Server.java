@@ -2,6 +2,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+/**
+ * Class for the server.
+ */
 public class Server {
     private ServerSocket ss;
     private int numPlayers;
@@ -9,6 +12,9 @@ public class Server {
     private boolean stop;
     private int artistIndex;
     
+    /**
+     * Constructor for class Server.
+     */
     public Server() {
         System.out.println("----Game Server----");
         numPlayers = 0;
@@ -23,10 +29,12 @@ public class Server {
         }
     }
     
+    /**
+     * Method that allows the server to start accepting connections.
+     */
     public void acceptConnections() {
         try {
             System.out.println("Waiting for connections...");
-            //First client to connect is the artist
             artistIndex = 1;
             while(numPlayers < 4) {
                 Socket s = ss.accept();
@@ -45,6 +53,9 @@ public class Server {
         }
     }
     
+    /**
+     * Inner class for the server side connection. Implements Runnable.
+     */
     private class ServerSideConnection implements Runnable {
         
         private Socket socket;
@@ -52,6 +63,12 @@ public class Server {
         private DataOutputStream dataOut;
         private int playerID;
         
+        /**
+         * Constructor for class ServerSideConnection.
+         * 
+         * @param s Socket object.
+         * @param id Player ID.
+         */
         public ServerSideConnection(Socket s, int id) {
             socket = s;
             playerID = id;
@@ -64,14 +81,15 @@ public class Server {
             }
         }
         
+        /**
+         * Method that runs the ServerSideConnection.
+         */
         public void run() {
             try {
                 dataOut.writeInt(playerID);
                 dataOut.writeInt(artistIndex);
                 dataOut.flush();
-                
-                //Loop will constantly run until the stop is false
-                //(idk yet how to make the stop false)
+
                 while(true) {
                 	String message = dataIn.readUTF();
                     System.out.println(message);
@@ -89,6 +107,11 @@ public class Server {
             }
         }
         
+        /**
+         * Method that sends the coordinates to the client as a string.
+         * 
+         * @param str String of coordinates.
+         */
         public void sendCoord(String str) {
             try {
             	dataOut.writeUTF(str);
@@ -98,6 +121,9 @@ public class Server {
             }
         }
         
+        /**
+         * Method that closes the coordinates.
+         */
         public void closeConnection() {
             try {
                 socket.close();
@@ -108,6 +134,11 @@ public class Server {
         }
     }
     
+    /**
+     * Main method.
+     * 
+     * @param args
+     */
     public static void main(String[] args) {
         Server gs = new Server();
         gs.acceptConnections();

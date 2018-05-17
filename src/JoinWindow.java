@@ -37,7 +37,7 @@ public class JoinWindow extends JFrame {
 	}
 	
 	/**
-	 * Sets up the join window.
+	 * Method that sets up the join window.
 	 */
 	public void setUpJoinWindow() {
 		this.setSize(300,200);
@@ -57,15 +57,7 @@ public class JoinWindow extends JFrame {
 	}
 	
 	/**
-	 * Closes the join window. 
-	 */
-	public void closeJoinScreen() {
-		 this.setVisible(false);
-		 this.dispose();
-	}
-	
-	/**
-	 * Sets up the "Join Game" button.
+	 * Method that sets up the join game button.
 	 */
 	public void getIP() {
 		ActionListener getIP = new ActionListener() {
@@ -80,5 +72,14 @@ public class JoinWindow extends JFrame {
 			}
 		};
 		joinGame.addActionListener(getIP);
+	}
+	
+
+	/**
+	 * Method that closes the join window. 
+	 */
+	public void closeJoinScreen() {
+		 this.setVisible(false);
+		 this.dispose();
 	}
 }

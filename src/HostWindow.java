@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 /**
- * Class for the window of the host.
+ * Class for the window of the host. Extends JFrame.
  */
 public class HostWindow extends JFrame {
 
@@ -16,8 +16,13 @@ public class HostWindow extends JFrame {
 	private Container container;
 	private JTextArea stuff;
 	private GameServer s;
-	private boolean stopBool;
 	
+	/**
+	 * Constructor for class HostWindow.
+	 * 
+	 * @param w Witdh of frame.
+	 * @param h Height of frame.
+	 */
 	public HostWindow( int w, int h) {
 		width = w;
 		height = h;
@@ -26,9 +31,11 @@ public class HostWindow extends JFrame {
 		container = this.getContentPane();
 		stuff = new JTextArea("AAA", 5, 2);
 		buttons = new JPanel();
-		stopBool = false;
 	}
 	
+	/**
+	 * Method that sets up the GUI of the host window.
+	 */
 	public void setUpHostWindow() {
 		this.setSize(width, height);
 		this.setTitle("Host Window");
@@ -46,6 +53,9 @@ public class HostWindow extends JFrame {
 		this.setVisible(true);
 	}
 
+	/**
+	 * Method that starts accepting connections to the server.
+	 */
 	public void startAcceptingConnections() {
 		ActionListener accept = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -63,6 +73,9 @@ public class HostWindow extends JFrame {
 		startAccepting.addActionListener(accept);
 	}
 	
+	/**
+	 * Method that stops accepting connections to the server.
+	 */
 	public void stopAcceptingConnections() {
 		ActionListener stop = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -73,24 +86,11 @@ public class HostWindow extends JFrame {
 		stopAccepting.addActionListener(stop);
 	}
 	
+	/**
+	 * Method that closes the host window.
+	 */
 	public void closeHostScreen() {
 		 this.setVisible(false);
 		 this.dispose();
 	}
-	
-	/*private class HostThread implements Runnable {
-		
-		public void run() {
-			s = new GameServer();
-			s.acceptConnections();
-			
-			while(true) {
-				if(stopBool) {
-					System.out.println("stop bool true");
-					s.stopAccepting();
-					break;
-				}
-			}
-		}
-	}*/
 }
