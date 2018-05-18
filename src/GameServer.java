@@ -9,17 +9,16 @@ import java.util.*;
 public class GameServer {
 	
 	private ServerSocket ss;
-	private int numPlayers, totalNumPlayers;
+	private int numPlayers, totalNumPlayers, team1Points, team2Points;
 	private boolean continueAccepting;
-	private int artistIndex1, artistIndex2;
+	private int artistIndex1, artistIndex2, roundNum, maxRounds;
 	private String artist1Name, artist2Name;
 	
 	private ArrayList<ReadFromClient> readRunnables;
 	private ArrayList<WriteToClient> writeRunnables;
+	private ArrayList<String> guesses;
 	
-	private String xyCoords1;
-	
-	private int teamNum;
+	private String xyCoords1, xyCoords2;
 	
 	/**
 	 * Constructor for class GameServer.
@@ -27,10 +26,16 @@ public class GameServer {
 	public GameServer() {
 		System.out.println("==== GAME SERVER ====");
 		numPlayers = 0;
+		team1Points = 0;
+		team2Points = 0;
+		roundNum = 1;
+		maxRounds = 5;
 		continueAccepting = true;
 		readRunnables = new ArrayList<ReadFromClient>();
 		writeRunnables = new ArrayList<WriteToClient>();
+		guesses = new ArrayList<String>();
 		xyCoords1 = "";
+		xyCoords2 = "";
 		try {
 			ss = new ServerSocket(45371);
 		} catch(IOException ex) {
@@ -66,8 +71,8 @@ public class GameServer {
 		totalNumPlayers = numPlayers;
 		System.out.println("Total: " + totalNumPlayers);
 		
-		for(WriteToClient currRFC : writeRunnables) {
-			Thread writeThread = new Thread(currRFC);
+		for(WriteToClient currWTC : writeRunnables) {
+			Thread writeThread = new Thread(currWTC);
 			writeThread.start();
 		}
 
@@ -93,12 +98,29 @@ public class GameServer {
 		}
 	}
 	
+	public int determineRoundWinner() {
+		for(String curr : guesses) {
+			if(curr.substring(0, curr.length()-1).equals("fellow")) {
+				if(curr.charAt(curr.length()-1) == '1') {
+					team1Points += 2;
+					return 1;
+				}
+				else {
+					team2Points += 2;
+					return 2;
+				}
+			}
+		}
+		return 0;
+	}
+	
 	/**
 	 * Inner class for reading input from the client. Implements Runnable.
 	 */
 	private class ReadFromClient implements Runnable {
 		private int playerID;
 		private ObjectInputStream dataIn;
+		private int teamNum;
 		
 		/**
 		 * Constructor for class ReadFromClient.
@@ -117,11 +139,27 @@ public class GameServer {
 		 */
 		public void run() {
 			try {
+				
+				if(playerID <= totalNumPlayers/2) {
+					teamNum = 1;
+					System.out.println("Player #" + playerID + " is Team 1!");
+				} else {
+					teamNum = 2;
+					System.out.println("Player #" + playerID + " is Team 2!");
+				}
+				
 				while(true) {
 					if(playerID == artistIndex1) {
 						xyCoords1 = (String) dataIn.readUnshared();
 					} else if (playerID == artistIndex2) {
-						//
+						xyCoords2 = (String) dataIn.readUnshared();
+					} else if(teamNum == 1 && playerID != artistIndex1) {
+						guesses.add(dataIn.readUTF() + "1");
+					} else {
+						guesses.add(dataIn.readUTF() + "2");
+					}
+					if(guesses.size() > 0) {
+						System.out.println(guesses.toString());
 					}
 				}
 			} catch(IOException ex) {
@@ -136,7 +174,7 @@ public class GameServer {
 	 * Inner class for writing output to the client. Implements Runnable.
 	 */
 	private class WriteToClient implements Runnable {
-		private int playerID;
+		private int playerID, teamNum;
 		private ObjectOutputStream dataOut;
 		
 		/**
@@ -158,14 +196,20 @@ public class GameServer {
 			try {
 				artistIndex1 = 1;
 				artistIndex2 = totalNumPlayers/2 + 1;
-				teamNum = 1;
+				if(playerID <= totalNumPlayers/2) {
+					teamNum = 1;
+					System.out.println("Player #" + playerID + " is Team 1!");
+				} else {
+					teamNum = 2;
+					System.out.println("Player #" + playerID + " is Team 2!");
+				}
 				dataOut.writeInt(teamNum);
 				if(teamNum == 1)
 					dataOut.writeInt(artistIndex1);
 				else
 					dataOut.writeInt(artistIndex2);
 				dataOut.flush();
-				System.out.println("Team Num #" + teamNum);
+				System.out.println("Player#" + playerID + ": Team Num #" + teamNum);
 				System.out.println("Artist1 Num #" + artistIndex1);
 				System.out.println("Artist2 Num #" + artistIndex2);
 				
@@ -173,6 +217,38 @@ public class GameServer {
 					if(teamNum == 1 && playerID != artistIndex1) {
 						dataOut.writeUnshared(xyCoords1);
 					}
+					else if(teamNum == 2 && playerID != artistIndex2) {
+						dataOut.writeUnshared(xyCoords2);
+					}
+					
+					int roundWinner = determineRoundWinner();
+					dataOut.writeInt(roundWinner);
+					if(roundWinner != 0) {
+						if(artistIndex1 != totalNumPlayers/2) {
+							artistIndex1++;
+						} else {
+							artistIndex1 = 1;
+						}
+						if(artistIndex2 != totalNumPlayers) {
+							artistIndex2++;
+						} else {
+							artistIndex2 = totalNumPlayers/2+1;
+						}
+						dataOut.writeInt(team1Points);
+						dataOut.writeInt(team2Points);
+						if(roundWinner == 1) {
+							dataOut.writeUTF("Team 1 won the round wow!");
+						} else {
+							dataOut.writeUTF("Team 2 won the round wow!");
+						}
+						if(teamNum == 1) {
+							dataOut.writeInt(artistIndex1);
+						} else {
+							dataOut.writeInt(artistIndex2);
+						}
+						guesses.clear();
+					}
+					
 					try {
 						Thread.sleep(5);
 					} catch(InterruptedException ex) {
@@ -183,17 +259,6 @@ public class GameServer {
 			} catch(IOException ex) {
 				System.out.println("IOException from WTC run()");
 			}
-		}
-		
-		/**
-		 * Method that determines the team number.
-		 * 
-		 * @return Integer for the team number.
-		 */
-		private int determineTeamNumber() {
-			if(playerID <= totalNumPlayers/2)
-				return 1;
-			return 2;
 		}
 	}
 	

@@ -20,16 +20,22 @@ public class CanvasFrame extends JFrame {
 	private JPanel buttonPanel;
 	private JPanel info;
 	private JLabel playerName;
-	private JLabel artistName;
+	private JLabel artistNameL;
+	private JLabel teamMembersL;
+	private JLabel typeAnswer;
+	private JTextField answer;
+	private JButton sendAnswer;
+	private String answerString;
 	
-	private String name, ip;
+	private String name, ip, teamMembers, artistName;
 	private int playerID;
     private int artistIndex;
     private int teamNum;
+    private int mePoints, enemyPoints;
+    private int roundNum, maxRounds;
 	private ReadFromServer rfsRunnable;
 	private WriteToServer wtsRunnable;
 	private Socket socket;
-	private int oldX, oldY, currX, currY;
 		
 	/**
 	 * 
@@ -48,6 +54,14 @@ public class CanvasFrame extends JFrame {
 		container = this.getContentPane();
 		name = n;
 		ip = i;
+		artistName = "dani";
+		name = "raymond";
+		teamMembers = "riana\ncisco\ncasey";
+		answerString = "";
+		mePoints = 0;
+		enemyPoints = 0;
+		roundNum = 1;
+		maxRounds = 5;
 	}
 	
 	/**
@@ -57,6 +71,9 @@ public class CanvasFrame extends JFrame {
 		this.setSize(width, height);
 		this.setTitle("Player #" + playerID);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		container.setLayout(new BorderLayout());
+
+		// Buttons south
 		five = new JButton("5");
 		ten = new JButton("10");
 		twenty = new JButton("20");
@@ -67,11 +84,7 @@ public class CanvasFrame extends JFrame {
 		yellow = new JButton("Yellow");
 		green = new JButton("Green");
 		eraser = new JButton("Eraser");
-		info = new JPanel();
 		buttonPanel = new JPanel();
-		playerName = new JLabel("Your Name: " + name);
-		artistName = new JLabel("Your Team Artist: ");
-		container.setLayout(new BorderLayout());
 		buttonPanel.setLayout(new GridLayout(1,10));
 		buttonPanel.add(five);
 		buttonPanel.add(ten);
@@ -84,19 +97,45 @@ public class CanvasFrame extends JFrame {
 		buttonPanel.add(eraser);
 		buttonPanel.add(clear);
 		container.add(buttonPanel, BorderLayout.SOUTH);
+		
+		// Info east
+		info = new JPanel();
+		playerName = new JLabel("Your Name: " + name);
+		artistNameL = new JLabel("Your Team Artist: " + artistName);
+		teamMembersL = new JLabel(teamMembers);
+		typeAnswer = new JLabel("Type Answer Here:");
+		sendAnswer = new JButton("Submit");
+		sendAnswer.setMaximumSize(new Dimension(Integer.MAX_VALUE, sendAnswer.getMinimumSize().height));
+		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
+		info.add(playerName);
+		info.add(artistNameL);
+		info.add(teamMembersL);
+		answer = new JTextField(10);
+		answer.setMaximumSize(new Dimension(Integer.MAX_VALUE, answer.getMinimumSize().height));
+		info.add(typeAnswer);
+		info.add(answer);
+		info.add(sendAnswer);
+		container.add(info, BorderLayout.EAST);
+		
 		this.getContentPane().setBackground(Color.WHITE);
 	}
 	
-	public void updateVisibility() {
-		if(playerID == artistIndex) {
-			System.out.println("Canvas added");
-			container.add(canvas, BorderLayout.CENTER);
+	public void updateVisibility(boolean v) {
+		if(v) {
+			if(playerID == artistIndex) {
+				System.out.println("Canvas added");
+//				canvas = new Canvas();
+				container.add(canvas, BorderLayout.CENTER);
+				container.revalidate();
+			}
+			else {
+				System.out.println("Watch Canvas added");
+//				watchCanvas = new WatchCanvas();
+				container.add(watchCanvas, BorderLayout.CENTER);
+				container.revalidate();
+			}
 		}
-		else {
-			System.out.println("Watch Canvas added");
-			container.add(watchCanvas, BorderLayout.CENTER);
-		}
-		this.setVisible(true);
+		this.setVisible(v);
 	}
 	
 	/**
@@ -123,6 +162,9 @@ public class CanvasFrame extends JFrame {
 					canvas.set5();
 				} else if ( ae.getSource() == ten ) {
 					canvas.set10();
+				} else if ( ae.getSource() == sendAnswer ) {
+					answerString = answer.getText();
+					answer.setText("");
 				} else {
 					canvas.set20();
 				}
@@ -138,6 +180,7 @@ public class CanvasFrame extends JFrame {
 		yellow.addActionListener(al);
 		green.addActionListener(al);
 		eraser.addActionListener(al);
+		sendAnswer.addActionListener(al);
 	}
 	
 	/**
@@ -185,7 +228,7 @@ public class CanvasFrame extends JFrame {
 			try {
 				teamNum = dataIn.readInt();
 				artistIndex = dataIn.readInt();
-				updateVisibility();
+				updateVisibility(true);
 				System.out.println("Team Num #" + teamNum);
 				System.out.println("Artist Num #" + artistIndex);
 				while(true) {
@@ -194,6 +237,28 @@ public class CanvasFrame extends JFrame {
 						watchCanvas.receiveCoords(xyCoords);
 						watchCanvas.repaint();
 					}
+					
+					int roundWinner = dataIn.readInt();
+					if(roundWinner != 0) {
+						if(teamNum == 1) {							
+							mePoints = dataIn.readInt();
+							enemyPoints = dataIn.readInt();
+						} else {
+							enemyPoints = dataIn.readInt();
+							mePoints = dataIn.readInt();
+						}
+						String winningMessage = dataIn.readUTF();
+						System.out.println(winningMessage);
+						updateVisibility(false);						
+						if ( artistIndex == playerID ) {
+							canvas.clear();
+						} else {
+							watchCanvas.clear();
+						}
+						artistIndex = dataIn.readInt();
+						updateVisibility(true);
+						continue;
+					} 
 				}
 			} catch(IOException ex) {
 				System.out.println("IOException from RFS run()");
@@ -237,6 +302,13 @@ public class CanvasFrame extends JFrame {
 						if(xCoords.size() > 0) {
 							dataOut.writeUnshared(z);
 							dataOut.flush();
+						}
+					} else {
+						if ( answerString.length() > 0 ) {
+							dataOut.writeUTF(answerString);
+							System.out.println("Guess is " + answerString);
+							dataOut.flush();
+							answerString = "";
 						}
 					}
 					try {

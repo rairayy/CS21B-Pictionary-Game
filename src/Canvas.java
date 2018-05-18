@@ -35,7 +35,6 @@ public class Canvas extends JComponent {
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
-				System.out.println("draggign");
 				currX = e.getX();
 				currY = e.getY();
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
