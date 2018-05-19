@@ -43,8 +43,8 @@ public class Canvas extends JComponent {
 				repaint();
 				oldX = currX;
 				oldY = currY;
-					xCoords.add(currX);
-					yCoords.add(currY);
+				xCoords.add(currX);
+				yCoords.add(currY);
 			}
 		});
 	}
@@ -57,7 +57,7 @@ public class Canvas extends JComponent {
 			image = createImage(getSize().width, getSize().height);
 			g2d = (Graphics2D) image.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			clear();
+//			clear();
 		}
 		g.drawImage(image, 0, 0, null);
 	}
@@ -90,6 +90,13 @@ public class Canvas extends JComponent {
 		g2d.setPaint(Color.WHITE);
 		g2d.fillRect(0, 0, getSize().width, getSize().height);
 		g2d.setPaint(Color.BLACK);
+		repaint();
+	}
+	
+	public void empty() {
+		xCoords.clear();
+		yCoords.clear();
+		image = null;
 		repaint();
 	}
 	

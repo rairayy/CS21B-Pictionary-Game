@@ -71,6 +71,7 @@ public class OpeningScreen extends JFrame {
 						public void run() {
 							HostWindow hw = new HostWindow(300,200);
 							hw.setUpHostWindow();
+							closeOpeningScreen();
 						}
 					});
 					t.start();

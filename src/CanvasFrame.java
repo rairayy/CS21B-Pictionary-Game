@@ -19,6 +19,7 @@ public class CanvasFrame extends JFrame {
 	private WatchCanvas watchCanvas;
 	private JPanel buttonPanel;
 	private JPanel info;
+	private JPanel canvasPanel;
 	private JLabel playerName;
 	private JLabel artistNameL;
 	private JLabel teamMembersL;
@@ -48,7 +49,11 @@ public class CanvasFrame extends JFrame {
 	 */
 	public CanvasFrame(int w, int h, String n, String i) {
 		canvas = new Canvas();
+		canvas.setPreferredSize(new Dimension(600,576));
 		watchCanvas = new WatchCanvas();
+		watchCanvas.setPreferredSize(new Dimension(600,576));
+		canvasPanel = new JPanel();
+		canvasPanel.setPreferredSize(new Dimension(600,576));
 		width = w;
 		height = h;
 		container = this.getContentPane();
@@ -72,7 +77,7 @@ public class CanvasFrame extends JFrame {
 		this.setTitle("Player #" + playerID);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		container.setLayout(new BorderLayout());
-
+		
 		// Buttons south
 		five = new JButton("5");
 		ten = new JButton("10");
@@ -124,14 +129,16 @@ public class CanvasFrame extends JFrame {
 		if(v) {
 			if(playerID == artistIndex) {
 				System.out.println("Canvas added");
-//				canvas = new Canvas();
-				container.add(canvas, BorderLayout.CENTER);
+				canvasPanel.removeAll();
+				canvasPanel.add(canvas);
+				container.add(canvasPanel, BorderLayout.CENTER);
 				container.revalidate();
 			}
 			else {
 				System.out.println("Watch Canvas added");
-//				watchCanvas = new WatchCanvas();
-				container.add(watchCanvas, BorderLayout.CENTER);
+				canvasPanel.removeAll();
+				canvasPanel.add(watchCanvas);
+				container.add(canvasPanel, BorderLayout.CENTER);
 				container.revalidate();
 			}
 		}
@@ -231,37 +238,48 @@ public class CanvasFrame extends JFrame {
 				updateVisibility(true);
 				System.out.println("Team Num #" + teamNum);
 				System.out.println("Artist Num #" + artistIndex);
+				System.out.println("C Width: " + canvas.getSize().width);
+				System.out.println("C Height: " + canvas.getSize().height);
+				System.out.println("WC Width: " + watchCanvas.getSize().width);
+				System.out.println("WC Height: " + watchCanvas.getSize().height);
+				boolean roundEnd = true;
 				while(true) {
-					if(artistIndex != playerID && artistIndex != 0) {
-						String xyCoords = (String) dataIn.readUnshared();
-						watchCanvas.receiveCoords(xyCoords);
-						watchCanvas.repaint();
+					if(roundEnd) {
+						if(artistIndex != playerID && artistIndex != 0) {
+							String xyCoords = (String) dataIn.readUnshared();
+							watchCanvas.receiveCoords(xyCoords);
+							watchCanvas.repaint();
+						}
+						
+						int roundWinner = dataIn.readInt();
+						if(roundWinner != 0) {
+							System.out.println("Round ends");
+							if(teamNum == 1) {							
+								mePoints = dataIn.readInt();
+								enemyPoints = dataIn.readInt();
+							} else {
+								enemyPoints = dataIn.readInt();
+								mePoints = dataIn.readInt();
+							}
+							String winningMessage = dataIn.readUTF();
+							System.out.println(winningMessage);
+							updateVisibility(false);						
+							if ( artistIndex == playerID ) {
+								canvas.empty();
+							} else {
+								watchCanvas.empty();
+							}
+							artistIndex = dataIn.readInt();
+							System.out.println(playerID + "New Artist: " + artistIndex);
+							updateVisibility(true);
+							roundEnd = false;
+							continue;
+						} 
 					}
-					
-					int roundWinner = dataIn.readInt();
-					if(roundWinner != 0) {
-						if(teamNum == 1) {							
-							mePoints = dataIn.readInt();
-							enemyPoints = dataIn.readInt();
-						} else {
-							enemyPoints = dataIn.readInt();
-							mePoints = dataIn.readInt();
-						}
-						String winningMessage = dataIn.readUTF();
-						System.out.println(winningMessage);
-						updateVisibility(false);						
-						if ( artistIndex == playerID ) {
-							canvas.clear();
-						} else {
-							watchCanvas.clear();
-						}
-						artistIndex = dataIn.readInt();
-						updateVisibility(true);
-						continue;
-					} 
 				}
 			} catch(IOException ex) {
 				System.out.println("IOException from RFS run()");
+				ex.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}

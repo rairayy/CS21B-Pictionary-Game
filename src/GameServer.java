@@ -154,7 +154,9 @@ public class GameServer {
 					} else if (playerID == artistIndex2) {
 						xyCoords2 = (String) dataIn.readUnshared();
 					} else if(teamNum == 1 && playerID != artistIndex1) {
-						guesses.add(dataIn.readUTF() + "1");
+						String guess = dataIn.readUTF();
+						guesses.add(guess + "1");
+						System.out.println("PID #" + playerID + "guessed: " + guess);
 					} else {
 						guesses.add(dataIn.readUTF() + "2");
 					}
@@ -213,40 +215,58 @@ public class GameServer {
 				System.out.println("Artist1 Num #" + artistIndex1);
 				System.out.println("Artist2 Num #" + artistIndex2);
 				
+				boolean roundEnd = true;
+				int currArtist1 = artistIndex1;
+				int currArtist2 = artistIndex2;
+				
 				while(true) {
-					if(teamNum == 1 && playerID != artistIndex1) {
-						dataOut.writeUnshared(xyCoords1);
-					}
-					else if(teamNum == 2 && playerID != artistIndex2) {
-						dataOut.writeUnshared(xyCoords2);
-					}
-					
-					int roundWinner = determineRoundWinner();
-					dataOut.writeInt(roundWinner);
-					if(roundWinner != 0) {
-						if(artistIndex1 != totalNumPlayers/2) {
-							artistIndex1++;
-						} else {
-							artistIndex1 = 1;
+					if(roundEnd) {
+						if(teamNum == 1 && playerID != currArtist1) {
+							dataOut.writeUnshared(xyCoords1);
+							System.out.println("PID #" + playerID + ": " + xyCoords1.toString());
 						}
-						if(artistIndex2 != totalNumPlayers) {
-							artistIndex2++;
-						} else {
-							artistIndex2 = totalNumPlayers/2+1;
+						else if(teamNum == 2 && playerID != currArtist2) {
+							dataOut.writeUnshared(xyCoords2);
+							System.out.println("PID #" + playerID + ": " + xyCoords2.toString());
 						}
-						dataOut.writeInt(team1Points);
-						dataOut.writeInt(team2Points);
-						if(roundWinner == 1) {
-							dataOut.writeUTF("Team 1 won the round wow!");
-						} else {
-							dataOut.writeUTF("Team 2 won the round wow!");
+						
+						int roundWinner = determineRoundWinner();
+						dataOut.writeInt(roundWinner);
+						System.out.println("Round Winner: " + roundWinner);
+						if(roundWinner != 0) {
+							System.out.println("#" + playerID + " round ends");
+							if(currArtist1 != totalNumPlayers/2) {
+								currArtist1++;
+							} else {
+								currArtist1 = 1;
+							}
+							if(currArtist2 != totalNumPlayers) {
+								currArtist2++;
+							} else {
+								currArtist2 = totalNumPlayers/2+1;
+							}
+							
+							artistIndex1 = currArtist1;
+							artistIndex2 = currArtist2;
+							
+							dataOut.writeInt(team1Points);
+							dataOut.writeInt(team2Points);
+							if(roundWinner == 1) {
+								dataOut.writeUTF("Team 1 won the round wow!");
+							} else {
+								dataOut.writeUTF("Team 2 won the round wow!");
+							}
+							if(teamNum == 1) {
+								dataOut.writeInt(currArtist1);
+							} else {
+								dataOut.writeInt(currArtist2);
+							}
+//							System.out.println("Team 1 Artist: " + artistIndex1);
+//							System.out.println("Team 2 Artist: " + artistIndex2);
+	//						guesses.clear();
+							roundEnd = false;
 						}
-						if(teamNum == 1) {
-							dataOut.writeInt(artistIndex1);
-						} else {
-							dataOut.writeInt(artistIndex2);
-						}
-						guesses.clear();
+						dataOut.flush();
 					}
 					
 					try {
