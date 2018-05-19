@@ -25,6 +25,8 @@ public class JoinWindow extends JFrame {
 	 * Constructor for class JoinWindow. 	
 	 */
 	public JoinWindow() {
+		container = this.getContentPane();
+		container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
 		ipLabel = new JLabel("Input Server IP Address:");
 		nameLabel = new JLabel("Input your Name:");
 		ipPanel = new JPanel();
@@ -32,7 +34,7 @@ public class JoinWindow extends JFrame {
 		inputIPAddress = new JTextField(20);
 		inputName = new JTextField(20);
 		joinGame = new JButton("Join Game");
-		container = this.getContentPane();
+		joinGame.setMaximumSize(new Dimension(Integer.MAX_VALUE, joinGame.getMinimumSize().height));
 		ip = "localhost";
 	}
 	
@@ -40,10 +42,11 @@ public class JoinWindow extends JFrame {
 	 * Method that sets up the join window.
 	 */
 	public void setUpJoinWindow() {
-		this.setSize(300,200);
+		this.getContentPane().setPreferredSize(new Dimension(300,200));
+		this.pack();
 		this.setTitle("Join Window");
 		inputIPAddress.setText("localhost");
-		container.setLayout(new GridLayout(3,1));
+		container.setPreferredSize(new Dimension(300,200));
 		ipPanel.add(ipLabel);
 		ipPanel.add(inputIPAddress);
 		namePanel.add(nameLabel);

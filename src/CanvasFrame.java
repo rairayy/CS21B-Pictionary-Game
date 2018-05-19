@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -17,8 +19,7 @@ public class CanvasFrame extends JFrame {
 	private JButton clear, black, red, blue, yellow, green, eraser, five, ten, twenty;
 	private Canvas canvas;
 	private WatchCanvas watchCanvas;
-	private JPanel buttonPanel;
-	private JPanel info;
+	private JPanel buttonPanel, infoPanel, canvasPanel, timerPanel;
 	private JLabel playerName;
 	private JLabel artistNameL;
 	private JLabel teamMembersL;
@@ -47,8 +48,6 @@ public class CanvasFrame extends JFrame {
 	 * @param i ip address
 	 */
 	public CanvasFrame(int w, int h, String n, String i) {
-		canvas = new Canvas();
-		watchCanvas = new WatchCanvas();
 		width = w;
 		height = h;
 		container = this.getContentPane();
@@ -62,16 +61,14 @@ public class CanvasFrame extends JFrame {
 		enemyPoints = 0;
 		roundNum = 1;
 		maxRounds = 5;
-	}
-	
-	/**
-	 * Sets up the CanvasFrame()
-	 */
-	public void setUpFrame() {
-		this.setSize(width, height);
-		this.setTitle("Player #" + playerID);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		container.setLayout(new BorderLayout());
+
+		// Canvas center
+		canvas = new Canvas();
+		canvas.setPreferredSize(new Dimension(600, 576));
+		watchCanvas = new WatchCanvas();
+		watchCanvas.setPreferredSize(new Dimension(600, 576));
+		canvasPanel = new JPanel();
+		canvas.setPreferredSize(new Dimension(600, 576));
 
 		// Buttons south
 		five = new JButton("5");
@@ -85,6 +82,38 @@ public class CanvasFrame extends JFrame {
 		green = new JButton("Green");
 		eraser = new JButton("Eraser");
 		buttonPanel = new JPanel();
+		buttonPanel.setPreferredSize(new Dimension(800,32));
+
+		// Info east
+		playerName = new JLabel("Your Name: " + name);
+		artistNameL = new JLabel("Your Team Artist: " + artistName);
+		teamMembersL = new JLabel(teamMembers);
+		typeAnswer = new JLabel("Type Answer Here:");
+		sendAnswer = new JButton("Submit");
+		sendAnswer.setMaximumSize(new Dimension(Integer.MAX_VALUE, sendAnswer.getMinimumSize().height));
+		answer = new JTextField(10);
+		answer.setMaximumSize(new Dimension(Integer.MAX_VALUE, answer.getMinimumSize().height));
+		infoPanel = new JPanel();
+		infoPanel.setPreferredSize(new Dimension(200,576));
+		infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		// Timer north
+		timerPanel = new JPanel();
+		timerPanel.setPreferredSize(new Dimension(800, 32));
+		
+	}
+	
+	/**
+	 * Sets up the CanvasFrame()
+	 */
+	public void setUpFrame() {
+		this.getContentPane().setPreferredSize(new Dimension(width, height));
+		this.pack();
+		this.setTitle("Player #" + playerID);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		container.setLayout(new BorderLayout());
+
+		// Buttons south
 		buttonPanel.setLayout(new GridLayout(1,10));
 		buttonPanel.add(five);
 		buttonPanel.add(ten);
@@ -99,23 +128,14 @@ public class CanvasFrame extends JFrame {
 		container.add(buttonPanel, BorderLayout.SOUTH);
 		
 		// Info east
-		info = new JPanel();
-		playerName = new JLabel("Your Name: " + name);
-		artistNameL = new JLabel("Your Team Artist: " + artistName);
-		teamMembersL = new JLabel(teamMembers);
-		typeAnswer = new JLabel("Type Answer Here:");
-		sendAnswer = new JButton("Submit");
-		sendAnswer.setMaximumSize(new Dimension(Integer.MAX_VALUE, sendAnswer.getMinimumSize().height));
-		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
-		info.add(playerName);
-		info.add(artistNameL);
-		info.add(teamMembersL);
-		answer = new JTextField(10);
-		answer.setMaximumSize(new Dimension(Integer.MAX_VALUE, answer.getMinimumSize().height));
-		info.add(typeAnswer);
-		info.add(answer);
-		info.add(sendAnswer);
-		container.add(info, BorderLayout.EAST);
+		infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
+		infoPanel.add(playerName);
+		infoPanel.add(artistNameL);
+		infoPanel.add(teamMembersL);
+		infoPanel.add(typeAnswer);
+		infoPanel.add(answer);
+		infoPanel.add(sendAnswer);
+		container.add(infoPanel, BorderLayout.EAST);
 		
 		this.getContentPane().setBackground(Color.WHITE);
 	}
@@ -124,14 +144,21 @@ public class CanvasFrame extends JFrame {
 		if(v) {
 			if(playerID == artistIndex) {
 				System.out.println("Canvas added");
-//				canvas = new Canvas();
-				container.add(canvas, BorderLayout.CENTER);
-				container.revalidate();
+				canvasPanel.add(canvas);
+				container.add(canvasPanel, BorderLayout.WEST);
+				this.pack();
+				System.out.println("C Width: " + canvas.getSize().width);
+//				canvas.requestFocusInWindow();
+//				container.revalidate();
 			}
 			else {
 				System.out.println("Watch Canvas added");
-//				watchCanvas = new WatchCanvas();
-				container.add(watchCanvas, BorderLayout.CENTER);
+//				watchCanvas.setPreferredSize(new Dimension(607, 575));
+				canvasPanel.add(watchCanvas);
+				container.add(canvasPanel, BorderLayout.WEST);
+				this.pack();
+				System.out.println("WC Width: " + watchCanvas.getSize().width);
+//				watchCanvas.requestFocusInWindow();
 				container.revalidate();
 			}
 		}
@@ -240,6 +267,7 @@ public class CanvasFrame extends JFrame {
 					
 					int roundWinner = dataIn.readInt();
 					if(roundWinner != 0) {
+						System.out.println("round ends");
 						if(teamNum == 1) {							
 							mePoints = dataIn.readInt();
 							enemyPoints = dataIn.readInt();
@@ -282,7 +310,7 @@ public class CanvasFrame extends JFrame {
 		 */
 		public WriteToServer(ObjectOutputStream out) {
 			dataOut = out;
-			System.out.println("WTC Runnable created");
+			System.out.println("WTS Runnable created");
 		}
 		
 		/**

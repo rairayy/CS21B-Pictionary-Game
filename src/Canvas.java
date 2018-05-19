@@ -47,6 +47,7 @@ public class Canvas extends JComponent {
 					yCoords.add(currY);
 			}
 		});
+//		this.requestFocusInWindow();
 	}
 	
 	/**

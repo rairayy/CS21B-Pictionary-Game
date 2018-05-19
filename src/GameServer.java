@@ -20,6 +20,8 @@ public class GameServer {
 	
 	private String xyCoords1, xyCoords2;
 	
+	private boolean indexChange;
+	
 	/**
 	 * Constructor for class GameServer.
 	 */
@@ -28,6 +30,7 @@ public class GameServer {
 		numPlayers = 0;
 		team1Points = 0;
 		team2Points = 0;
+		indexChange = false;
 		roundNum = 1;
 		maxRounds = 5;
 		continueAccepting = true;
@@ -103,10 +106,12 @@ public class GameServer {
 			if(curr.substring(0, curr.length()-1).equals("fellow")) {
 				if(curr.charAt(curr.length()-1) == '1') {
 					team1Points += 2;
+					indexChange = false;
 					return 1;
 				}
 				else {
 					team2Points += 2;
+					indexChange = false;
 					return 2;
 				}
 			}
@@ -222,15 +227,19 @@ public class GameServer {
 					}
 					
 					int roundWinner = determineRoundWinner();
+//					System.out.println("Artist 1: " + artistIndex1);
+//					System.out.println("Artist 2: " + artistIndex2);
 					dataOut.writeInt(roundWinner);
 					if(roundWinner != 0) {
-						if(artistIndex1 != totalNumPlayers/2) {
+						if(artistIndex1 != totalNumPlayers/2 && indexChange == false) {
 							artistIndex1++;
+							indexChange = true;
 						} else {
 							artistIndex1 = 1;
 						}
-						if(artistIndex2 != totalNumPlayers) {
+						if(artistIndex2 != totalNumPlayers && indexChange == false) {
 							artistIndex2++;
+							indexChange = true;
 						} else {
 							artistIndex2 = totalNumPlayers/2+1;
 						}
@@ -246,7 +255,7 @@ public class GameServer {
 						} else {
 							dataOut.writeInt(artistIndex2);
 						}
-						guesses.clear();
+//						guesses.clear();
 					}
 					
 					try {

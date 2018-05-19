@@ -29,11 +29,16 @@ public class OpeningScreen extends JFrame {
 	public OpeningScreen( int w, int h ) {
 		width = w;
 		height = h;
-		hostGame = new JButton("Host Game");
-		joinGame = new JButton("Join Game");
-		buttonPanel = new JPanel();
-		iconLabel = new JLabel();
 		container = this.getContentPane();
+		container.setLayout(new BorderLayout());
+		hostGame = new JButton("Host Game");
+		hostGame.setMaximumSize(new Dimension(Integer.MAX_VALUE, hostGame.getMinimumSize().height));
+		joinGame = new JButton("Join Game");
+		joinGame.setMaximumSize(new Dimension(Integer.MAX_VALUE, joinGame.getMinimumSize().height));
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
+		buttonPanel.setPreferredSize(new Dimension(100,60));
+		iconLabel = new JLabel();
 		img = new ImageIcon();
 		try {
 			logo = ImageIO.read(new File("pencil.png"));
@@ -48,10 +53,10 @@ public class OpeningScreen extends JFrame {
 	 * Method that sets up the opening screen.
 	 */
 	public void setUpOpeningScreen() {
-		this.setSize(width, height);
+		this.getContentPane().setPreferredSize(new Dimension(width, height));
+		this.pack();
 		this.setTitle("Opening Screen");
-		container.setLayout(new BorderLayout());
-		container.add(iconLabel, BorderLayout.NORTH);
+		container.add(iconLabel);
 		buttonPanel.add(hostGame);
 		buttonPanel.add(joinGame);
 		container.add(buttonPanel, BorderLayout.SOUTH);
@@ -69,7 +74,7 @@ public class OpeningScreen extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 					Thread t = new Thread(new Runnable() {
 						public void run() {
-							HostWindow hw = new HostWindow(300,200);
+							HostWindow hw = new HostWindow(300,80);
 							hw.setUpHostWindow();
 						}
 					});
