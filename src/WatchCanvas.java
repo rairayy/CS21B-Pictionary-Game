@@ -57,6 +57,10 @@ public class WatchCanvas extends JComponent {
 			setting = Integer.parseInt(zA[0].substring(0,1));
 			xCoords = x;
 			yCoords = y;
+		} else if(z.equals("0")) {
+			clear();
+			xCoords = "";
+			yCoords = "";
 		}
 	}
 	

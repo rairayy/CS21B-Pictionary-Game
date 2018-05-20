@@ -169,7 +169,7 @@ public class CanvasFrame extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				if ( ae.getSource() == clear ) {
 					canvas.clear();
-					setting = 0;
+					wtsRunnable.sendClear();
 				} else if ( ae.getSource() == black ) {
 					canvas.black();
 					setting = 1;
@@ -350,6 +350,11 @@ public class CanvasFrame extends JFrame {
 						String x = xCoords2.toString();
 						String y = yCoords2.toString();
 						String z = fromClientSettings+x+y;
+						if(fromClientSettings != 0) {
+							z = fromClientSettings+x+y;
+						} else {
+							z = "0";
+						}
 						if(xCoords.size() > 0) {
 							dataOut.writeUnshared(z);
 							dataOut.flush();
@@ -372,7 +377,16 @@ public class CanvasFrame extends JFrame {
 			} catch(IOException ex) {
 				System.out.println("IOException from WTS run()");
 			}
-		}	
+		}
+		
+		public void sendClear() {
+			try {
+				dataOut.writeUnshared("0");
+				dataOut.flush();
+			} catch(IOException ex) {
+				System.out.println("IOException from sendClear()");
+			}
+		}
 	}
 	
 	/**
