@@ -19,6 +19,7 @@ public class GameServer {
 	private ArrayList<String> guesses;
 	
 	private String xyCoords1, xyCoords2;
+	private boolean[] checkRoundEnd;
 
 	/**
 	 * Constructor for class GameServer.
@@ -71,6 +72,11 @@ public class GameServer {
 		totalNumPlayers = numPlayers;
 		System.out.println("Total: " + totalNumPlayers);
 		
+		checkRoundEnd = new boolean[totalNumPlayers];
+		for(int i = 0; i < checkRoundEnd.length; i++) {
+			checkRoundEnd[i] = false;
+		}
+		
 		for(WriteToClient currWTC : writeRunnables) {
 			Thread writeThread = new Thread(currWTC);
 			writeThread.start();
@@ -119,6 +125,18 @@ public class GameServer {
 		return 0;
 	}
 	
+	public boolean moveToNextRound() {
+		for(int i = 0; i < checkRoundEnd.length; i++) {
+			if(!checkRoundEnd[i]) {
+				return false;
+			}
+		}
+		guesses.clear();
+		xyCoords1 = "";
+		xyCoords2 = "";
+		return true;
+	}
+	
 	/**
 	 * Inner class for reading input from the client. Implements Runnable.
 	 */
@@ -156,14 +174,22 @@ public class GameServer {
 				while(true) {
 					if(playerID == artistIndex1) {
 						xyCoords1 = (String) dataIn.readUnshared();
+						System.out.println("#" + playerID + " Artist: " + xyCoords1);
 					} else if (playerID == artistIndex2) {
 						xyCoords2 = (String) dataIn.readUnshared();
+						System.out.println("#" + playerID + " Artist: " + xyCoords2);
 					} else if(teamNum == 1 && playerID != artistIndex1) {
-						String guess = dataIn.readUTF();
-						guesses.add(guess + "1");
-						System.out.println("PID #" + playerID + "guessed: " + guess);
+						String guess = (String) dataIn.readUnshared();
+						if(guess.charAt(0) != '[' && guess.charAt(guess.length()-1) != ']') {
+							guesses.add(guess + "1");
+							System.out.println("#" + playerID + " guessed: " + guess);
+						}
 					} else {
-						guesses.add(dataIn.readUTF() + "2");
+						String guess = (String)dataIn.readUnshared();
+						if(guess.charAt(0) != '[' && guess.charAt(guess.length()-1) != ']') {
+							guesses.add(guess + "2");
+							System.out.println("#" + playerID + " guessed: " + guess);
+						}
 					}
 					if(guesses.size() > 0) {
 						System.out.println(guesses.toString());
@@ -183,6 +209,8 @@ public class GameServer {
 	private class WriteToClient implements Runnable {
 		private int playerID, teamNum;
 		private ObjectOutputStream dataOut;
+		private boolean roundEnd;
+		private int currRound;
 		
 		/**
 		 * Constructor for class WriteToClient.
@@ -193,6 +221,8 @@ public class GameServer {
 		public WriteToClient(int pid, ObjectOutputStream out) {
 			playerID = pid;
 			dataOut = out;
+			roundEnd = true;
+			currRound = 0;
 			System.out.println("WTC" + playerID + " Runnable created");
 		}
 		
@@ -220,7 +250,6 @@ public class GameServer {
 				System.out.println("Artist1 Num #" + artistIndex1);
 				System.out.println("Artist2 Num #" + artistIndex2);
 				
-				boolean roundEnd = true;
 				int currArtist1 = artistIndex1;
 				int currArtist2 = artistIndex2;
 				
@@ -228,16 +257,13 @@ public class GameServer {
 					if(roundEnd) {
 						if(teamNum == 1 && playerID != currArtist1) {
 							dataOut.writeUnshared(xyCoords1);
-							System.out.println("PID #" + playerID + ": " + xyCoords1.toString());
 						}
 						else if(teamNum == 2 && playerID != currArtist2) {
 							dataOut.writeUnshared(xyCoords2);
-							System.out.println("PID #" + playerID + ": " + xyCoords2.toString());
 						}
 						
 						int roundWinner = determineRoundWinner();
 						dataOut.writeInt(roundWinner);
-						System.out.println("Round Winner: " + roundWinner);
 						if(roundWinner != 0) {
 							System.out.println("#" + playerID + " round ends");
 							if(currArtist1 != totalNumPlayers/2) {
@@ -267,9 +293,20 @@ public class GameServer {
 								dataOut.writeInt(currArtist2);
 							}
 							roundEnd = false;
+							currRound++;
+							checkRoundEnd[playerID-1] = true;
+							dataOut.reset();
 						}
 						dataOut.flush();
+					} else {
+						if(moveToNextRound()) {
+							roundNum = currRound;
+							roundEnd = true;
+							dataOut.writeBoolean(roundEnd);
+							System.out.println("Move to next round: " + roundEnd);
+						}
 					}
+					dataOut.flush();
 					
 					try {
 						Thread.sleep(5);

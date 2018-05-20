@@ -97,6 +97,7 @@ public class CanvasFrame extends JFrame {
 		answer.setMaximumSize(new Dimension(Integer.MAX_VALUE, answer.getMinimumSize().height));
 		info = new JPanel();
 		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
+		info.setPreferredSize(new Dimension(200,576));
 		info.setBorder(new EmptyBorder(10, 10, 10, 10));
 	}
 	
@@ -291,15 +292,20 @@ public class CanvasFrame extends JFrame {
 							updateVisibility(false);						
 							if ( artistIndex == playerID ) {
 								canvas.empty();
+								wtsRunnable.dataOut.writeUnshared("done");
 							} else {
 								watchCanvas.empty();
 							}
 							artistIndex = dataIn.readInt();
-							System.out.println(playerID + "New Artist: " + artistIndex);
 							updateVisibility(true);
 							roundEnd = false;
+							wtsRunnable.dataOut.reset();
 							continue;
 						} 
+					} else {
+						setting = 1;
+						roundEnd = dataIn.readBoolean();
+						System.out.println("Round started: " + roundEnd);
 					}
 				}
 			} catch(IOException ex) {
@@ -350,7 +356,7 @@ public class CanvasFrame extends JFrame {
 						}
 					} else {
 						if ( answerString.length() > 0 ) {
-							dataOut.writeUTF(answerString);
+							dataOut.writeUnshared(answerString);
 							System.out.println("Guess is " + answerString);
 							dataOut.flush();
 							answerString = "";

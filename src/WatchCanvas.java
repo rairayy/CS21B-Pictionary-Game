@@ -158,6 +158,7 @@ public class WatchCanvas extends JComponent {
 		xCoords = "";
 		yCoords = "";
 		image = null;
+		setting = -1;
 		repaint();
 	}
 	
