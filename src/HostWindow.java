@@ -3,6 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 /**
  * Class for the window of the host. Extends JFrame.
@@ -14,7 +15,6 @@ public class HostWindow extends JFrame {
 	private JButton stopAccepting, startAccepting;
 	private JPanel buttons;
 	private Container container;
-	private JTextArea stuff;
 	private GameServer s;
 	
 	/**
@@ -26,10 +26,13 @@ public class HostWindow extends JFrame {
 	public HostWindow( int w, int h) {
 		width = w;
 		height = h;
-		startAccepting = new JButton("Start Accepting Connections");
-		stopAccepting = new JButton("Stop Accepting Connections");
 		container = this.getContentPane();
-		stuff = new JTextArea("AAA", 5, 2);
+		container.setLayout(new BorderLayout());
+
+		startAccepting = new JButton("Start Accepting Connections");
+		startAccepting.setMinimumSize(new Dimension(Integer.MAX_VALUE, startAccepting.getMinimumSize().height));
+		stopAccepting = new JButton("Stop Accepting Connections");
+		stopAccepting.setMinimumSize(new Dimension(Integer.MAX_VALUE, stopAccepting.getMinimumSize().height));
 		buttons = new JPanel();
 	}
 	
@@ -37,15 +40,15 @@ public class HostWindow extends JFrame {
 	 * Method that sets up the GUI of the host window.
 	 */
 	public void setUpHostWindow() {
-		this.setSize(width, height);
+		this.getContentPane().setPreferredSize(new Dimension(width, height));
+		this.pack();
 		this.setTitle("Host Window");
-		container.setLayout(new BorderLayout());
-		container.add(stuff, BorderLayout.NORTH);
-		stuff.setEditable(false);
+		
 		buttons.setLayout(new FlowLayout());
 		buttons.add(startAccepting);
 		buttons.add(stopAccepting);
 		container.add(buttons, BorderLayout.CENTER);
+		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.startAcceptingConnections();
 		this.stopAcceptingConnections();

@@ -57,7 +57,7 @@ public class Canvas extends JComponent {
 			image = createImage(getSize().width, getSize().height);
 			g2d = (Graphics2D) image.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//			clear();
+			clear();
 		}
 		g.drawImage(image, 0, 0, null);
 	}

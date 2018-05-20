@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -16,7 +18,7 @@ public class JoinWindow extends JFrame {
 	private JButton joinGame;
 	private Container container;
 	
-	private JPanel ipPanel, namePanel;
+	private JPanel allPanel, buttonPanel;
 	
 	private String name;
 	private String ip;
@@ -25,14 +27,26 @@ public class JoinWindow extends JFrame {
 	 * Constructor for class JoinWindow. 	
 	 */
 	public JoinWindow() {
+		container = this.getContentPane();
+
+		allPanel = new JPanel();
+		allPanel.setLayout(new BoxLayout(allPanel, BoxLayout.PAGE_AXIS));
+		allPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		
 		ipLabel = new JLabel("Input Server IP Address:");
 		nameLabel = new JLabel("Input your Name:");
-		ipPanel = new JPanel();
-		namePanel = new JPanel();
 		inputIPAddress = new JTextField(20);
+		inputIPAddress.setMaximumSize(new Dimension(Integer.MAX_VALUE, inputIPAddress.getMinimumSize().height));
 		inputName = new JTextField(20);
+		inputName.setMaximumSize(new Dimension(Integer.MAX_VALUE, inputName.getMinimumSize().height));
+		
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
+		buttonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		joinGame = new JButton("Join Game");
-		container = this.getContentPane();
+		joinGame.setMaximumSize(new Dimension(Integer.MAX_VALUE, joinGame.getMinimumSize().height));
+		
 		ip = "localhost";
 	}
 	
@@ -40,17 +54,28 @@ public class JoinWindow extends JFrame {
 	 * Method that sets up the join window.
 	 */
 	public void setUpJoinWindow() {
-		this.setSize(300,200);
+		this.getContentPane().setPreferredSize(new Dimension(300,130));
+		this.pack();
 		this.setTitle("Join Window");
+
 		inputIPAddress.setText("localhost");
-		container.setLayout(new GridLayout(3,1));
-		ipPanel.add(ipLabel);
-		ipPanel.add(inputIPAddress);
-		namePanel.add(nameLabel);
-		namePanel.add(inputName);
-		container.add(ipPanel);
-		container.add(namePanel);
-		container.add(joinGame);
+		
+		allPanel.add(ipLabel);
+		allPanel.add(inputIPAddress);
+		allPanel.add(nameLabel);
+		allPanel.add(inputName);
+		buttonPanel.add(joinGame);
+		allPanel.add(buttonPanel);
+		container.add(allPanel);
+		
+//		ipPanel.add(ipLabel);
+//		ipPanel.add(inputIPAddress);
+//		namePanel.add(nameLabel);
+//		namePanel.add(inputName);
+//		container.add(ipPanel);
+//		container.add(namePanel);
+//		container.add(joinGame);
+		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getIP();
 		this.setVisible(true);

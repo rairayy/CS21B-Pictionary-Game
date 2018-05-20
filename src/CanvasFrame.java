@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -17,13 +19,8 @@ public class CanvasFrame extends JFrame {
 	private JButton clear, black, red, blue, yellow, green, eraser, five, ten, twenty;
 	private Canvas canvas;
 	private WatchCanvas watchCanvas;
-	private JPanel buttonPanel;
-	private JPanel info;
-	private JPanel canvasPanel;
-	private JLabel playerName;
-	private JLabel artistNameL;
-	private JLabel teamMembersL;
-	private JLabel typeAnswer;
+	private JPanel buttonPanel, info, canvasPanel;
+	private JLabel playerName, artistNameL, teamMembersL, typeAnswer;
 	private JTextField answer;
 	private JButton sendAnswer;
 	private String answerString;
@@ -34,6 +31,7 @@ public class CanvasFrame extends JFrame {
     private int teamNum;
     private int mePoints, enemyPoints;
     private int roundNum, maxRounds;
+    
 	private ReadFromServer rfsRunnable;
 	private WriteToServer wtsRunnable;
 	private Socket socket;
@@ -48,12 +46,6 @@ public class CanvasFrame extends JFrame {
 	 * @param i ip address
 	 */
 	public CanvasFrame(int w, int h, String n, String i) {
-		canvas = new Canvas();
-		canvas.setPreferredSize(new Dimension(600,576));
-		watchCanvas = new WatchCanvas();
-		watchCanvas.setPreferredSize(new Dimension(600,576));
-		canvasPanel = new JPanel();
-		canvasPanel.setPreferredSize(new Dimension(600,576));
 		width = w;
 		height = h;
 		container = this.getContentPane();
@@ -67,16 +59,14 @@ public class CanvasFrame extends JFrame {
 		enemyPoints = 0;
 		roundNum = 1;
 		maxRounds = 5;
-	}
-	
-	/**
-	 * Sets up the CanvasFrame()
-	 */
-	public void setUpFrame() {
-		this.setSize(width, height);
-		this.setTitle("Player #" + playerID);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		container.setLayout(new BorderLayout());
+		
+		// Canvas center
+		canvas = new Canvas();
+		canvas.setPreferredSize(new Dimension(600,576));
+		watchCanvas = new WatchCanvas();
+		watchCanvas.setPreferredSize(new Dimension(600,576));
+		canvasPanel = new JPanel();
+		canvasPanel.setPreferredSize(new Dimension(600,576));
 		
 		// Buttons south
 		five = new JButton("5");
@@ -91,6 +81,33 @@ public class CanvasFrame extends JFrame {
 		eraser = new JButton("Eraser");
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(1,10));
+		buttonPanel.setPreferredSize(new Dimension(800,58));
+
+		// Info east
+		playerName = new JLabel("Your Name: " + name);
+		artistNameL = new JLabel("Your Team Artist: " + artistName);
+		teamMembersL = new JLabel(teamMembers);
+		typeAnswer = new JLabel("Type Answer Here:");
+		sendAnswer = new JButton("Submit");
+		sendAnswer.setMaximumSize(new Dimension(Integer.MAX_VALUE, sendAnswer.getMinimumSize().height));
+		answer = new JTextField(10);
+		answer.setMaximumSize(new Dimension(Integer.MAX_VALUE, answer.getMinimumSize().height));
+		info = new JPanel();
+		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
+		info.setBorder(new EmptyBorder(10, 10, 10, 10));
+	}
+	
+	/**
+	 * Sets up the CanvasFrame()
+	 */
+	public void setUpFrame() {
+		this.getContentPane().setPreferredSize(new Dimension(width, height));
+		this.pack();
+		this.setTitle("Player #" + playerID);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		container.setLayout(new BorderLayout());
+		
+		// Buttons south
 		buttonPanel.add(five);
 		buttonPanel.add(ten);
 		buttonPanel.add(twenty);
@@ -104,19 +121,9 @@ public class CanvasFrame extends JFrame {
 		container.add(buttonPanel, BorderLayout.SOUTH);
 		
 		// Info east
-		info = new JPanel();
-		playerName = new JLabel("Your Name: " + name);
-		artistNameL = new JLabel("Your Team Artist: " + artistName);
-		teamMembersL = new JLabel(teamMembers);
-		typeAnswer = new JLabel("Type Answer Here:");
-		sendAnswer = new JButton("Submit");
-		sendAnswer.setMaximumSize(new Dimension(Integer.MAX_VALUE, sendAnswer.getMinimumSize().height));
-		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
 		info.add(playerName);
 		info.add(artistNameL);
 		info.add(teamMembersL);
-		answer = new JTextField(10);
-		answer.setMaximumSize(new Dimension(Integer.MAX_VALUE, answer.getMinimumSize().height));
 		info.add(typeAnswer);
 		info.add(answer);
 		info.add(sendAnswer);
