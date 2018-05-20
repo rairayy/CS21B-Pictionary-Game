@@ -14,6 +14,7 @@ public class WatchCanvas extends JComponent {
 	private Graphics2D g2d;
 	private float thickness;
 	private String xCoords, yCoords;
+	private int setting;
 	
 	/**
 	 * Constructor for class WatchCanvas.
@@ -23,6 +24,7 @@ public class WatchCanvas extends JComponent {
 		setDoubleBuffered(false);
 		xCoords = "";
 		yCoords = "";
+		setting = 0;
 	}
 	
 	/**
@@ -35,6 +37,7 @@ public class WatchCanvas extends JComponent {
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
 		} else {
+			updateSettings(setting);
 			parseCoordinates(xCoords, yCoords, g2d);
 		}
 		g.drawImage(image, 0, 0, null);
@@ -49,10 +52,51 @@ public class WatchCanvas extends JComponent {
 	public void receiveCoords( String z ) {
 		if ( z.length() > 6 ) {
 			String[] zA = z.split(Pattern.quote("]["));
-			String x = zA[0].substring(1, zA[0].length());
+			String x = zA[0].substring(2, zA[0].length());
 			String y = zA[1].substring(0, zA[1].length()-1);
+			setting = Integer.parseInt(zA[0].substring(0,1));
 			xCoords = x;
 			yCoords = y;
+		}
+	}
+	
+	/**
+	 * Method that updates the line style.
+	 * 
+	 * @param s Integer that indicates the change in setting.
+	 */
+	public void updateSettings(int s) {
+		switch(s) {
+			case 0:
+				clear();
+				break;
+			case 1:
+				black();
+				break;
+			case 2:
+				red();
+				break;
+			case 3:
+				blue();
+				break;
+			case 4:
+				yellow();
+				break;
+			case 5:
+				green();
+				break;
+			case 6:
+				eraser();
+				break;
+			case 7:
+				set5();
+				break;
+			case 8:
+				set10();
+				break;
+			case 9:
+				set20();
+				break;
 		}
 	}
 	
@@ -107,6 +151,9 @@ public class WatchCanvas extends JComponent {
 		repaint();
 	}
 	
+	/**
+	 * Method that nullifies the image and clears the x and y coordinate strings.
+	 */
 	public void empty() {
 		xCoords = "";
 		yCoords = "";

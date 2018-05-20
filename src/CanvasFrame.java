@@ -35,6 +35,8 @@ public class CanvasFrame extends JFrame {
 	private ReadFromServer rfsRunnable;
 	private WriteToServer wtsRunnable;
 	private Socket socket;
+	
+	private int setting;
 		
 	/**
 	 * 
@@ -59,6 +61,7 @@ public class CanvasFrame extends JFrame {
 		enemyPoints = 0;
 		roundNum = 1;
 		maxRounds = 5;
+		setting = 1;
 		
 		// Canvas center
 		canvas = new Canvas();
@@ -98,7 +101,7 @@ public class CanvasFrame extends JFrame {
 	}
 	
 	/**
-	 * Sets up the CanvasFrame()
+	 * Method that sets up the CanvasFrame.
 	 */
 	public void setUpFrame() {
 		this.getContentPane().setPreferredSize(new Dimension(width, height));
@@ -132,6 +135,11 @@ public class CanvasFrame extends JFrame {
 		this.getContentPane().setBackground(Color.WHITE);
 	}
 	
+	/**
+	 * Method that updates the canvas and its visibility.
+	 * 
+	 * @param v Boolean that indicates if the canvas should be visible or not.
+	 */
 	public void updateVisibility(boolean v) {
 		if(v) {
 			if(playerID == artistIndex) {
@@ -153,34 +161,44 @@ public class CanvasFrame extends JFrame {
 	}
 	
 	/**
-	 * Sets up the buttons
+	 * Sets up the buttons.
 	 */
 	public void setUpButtons() {
 		ActionListener al = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				if ( ae.getSource() == clear ) {
 					canvas.clear();
+					setting = 0;
 				} else if ( ae.getSource() == black ) {
 					canvas.black();
+					setting = 1;
 				} else if ( ae.getSource() == red ) {
 					canvas.red();
+					setting = 2;
 				} else if ( ae.getSource() == blue ) {
 					canvas.blue();
+					setting = 3;
 				} else if ( ae.getSource() == yellow ) {
 					canvas.yellow();
+					setting = 4;
 				} else if ( ae.getSource() == green ) {
 					canvas.green();
+					setting = 5;
 				} else if ( ae.getSource() == eraser ) {
 					canvas.eraser();
+					setting = 6;
 				} else if ( ae.getSource() == five ) {
 					canvas.set5();
+					setting = 7;
 				} else if ( ae.getSource() == ten ) {
 					canvas.set10();
+					setting = 8;
 				} else if ( ae.getSource() == sendAnswer ) {
 					answerString = answer.getText();
 					answer.setText("");
 				} else {
 					canvas.set20();
+					setting = 9;
 				}
 			}
 		};
@@ -196,7 +214,7 @@ public class CanvasFrame extends JFrame {
 		eraser.addActionListener(al);
 		sendAnswer.addActionListener(al);
 	}
-	
+
 	/**
 	 * Connects the CanvasFrame to the server
 	 */
@@ -317,13 +335,15 @@ public class CanvasFrame extends JFrame {
 			try {
 				while(true) {
 					if(playerID == artistIndex) {
+						int fromClientSettings = setting;
+						
 						ArrayList<Integer> xCoords = canvas.getXCoords();
 						ArrayList<Integer> yCoords = canvas.getYCoords();
 						CopyOnWriteArrayList<Integer> xCoords2 = new CopyOnWriteArrayList<Integer>(xCoords);
 						CopyOnWriteArrayList<Integer> yCoords2 = new CopyOnWriteArrayList<Integer>(yCoords);
 						String x = xCoords2.toString();
 						String y = yCoords2.toString();
-						String z = x+y;
+						String z = fromClientSettings+x+y;
 						if(xCoords.size() > 0) {
 							dataOut.writeUnshared(z);
 							dataOut.flush();

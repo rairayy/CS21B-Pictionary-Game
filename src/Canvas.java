@@ -93,6 +93,9 @@ public class Canvas extends JComponent {
 		repaint();
 	}
 	
+	/**
+	 * Method that clears the x and y coordinate ArrayLists and nullifies the image.
+	 */
 	public void empty() {
 		xCoords.clear();
 		yCoords.clear();
@@ -109,6 +112,7 @@ public class Canvas extends JComponent {
 	
 	/**
 	 * Method that sets paint color to red.
+	 * 
 	 */
 	public void red() {
 		g2d.setPaint(Color.RED);
@@ -170,10 +174,20 @@ public class Canvas extends JComponent {
 		return currY;
 	}
 	
+	/**
+	 * Method that gets the x-coordinate ArrayList.
+	 * 
+	 * @return ArrayList of x-coordinate integers.
+	 */
 	public ArrayList<Integer> getXCoords() {
 		return xCoords;
 	}
 
+	/**
+	 * Method that gets the y-coordinate ArrayList.
+	 * 
+	 * @return ArrayList of y-coordinate integers.
+	 */
 	public ArrayList<Integer> getYCoords() {
 		return yCoords;
 	}

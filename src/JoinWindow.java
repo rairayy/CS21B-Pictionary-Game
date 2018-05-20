@@ -68,14 +68,6 @@ public class JoinWindow extends JFrame {
 		allPanel.add(buttonPanel);
 		container.add(allPanel);
 		
-//		ipPanel.add(ipLabel);
-//		ipPanel.add(inputIPAddress);
-//		namePanel.add(nameLabel);
-//		namePanel.add(inputName);
-//		container.add(ipPanel);
-//		container.add(namePanel);
-//		container.add(joinGame);
-		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getIP();
 		this.setVisible(true);

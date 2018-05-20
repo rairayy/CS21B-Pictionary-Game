@@ -64,11 +64,6 @@ public class OpeningScreen extends JFrame {
 		this.pack();
 		this.setTitle("Opening Screen");
 		
-//		container.add(iconLabel);
-//		buttonPanel.add(hostGame);
-//		buttonPanel.add(joinGame);
-//		container.add(buttonPanel, BorderLayout.SOUTH);
-		
 		allPanel.add(iconLabel);
 		buttonPanel.add(hostGame);
 		buttonPanel.add(joinGame);

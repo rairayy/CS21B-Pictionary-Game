@@ -19,7 +19,7 @@ public class GameServer {
 	private ArrayList<String> guesses;
 	
 	private String xyCoords1, xyCoords2;
-	
+
 	/**
 	 * Constructor for class GameServer.
 	 */
@@ -98,6 +98,11 @@ public class GameServer {
 		}
 	}
 	
+	/**
+	 * Method that determines the round winner.
+	 * 
+	 * @return Integer indicating team that won the round.
+	 */
 	public int determineRoundWinner() {
 		for(String curr : guesses) {
 			if(curr.substring(0, curr.length()-1).equals("fellow")) {
@@ -261,9 +266,6 @@ public class GameServer {
 							} else {
 								dataOut.writeInt(currArtist2);
 							}
-//							System.out.println("Team 1 Artist: " + artistIndex1);
-//							System.out.println("Team 2 Artist: " + artistIndex2);
-	//						guesses.clear();
 							roundEnd = false;
 						}
 						dataOut.flush();
