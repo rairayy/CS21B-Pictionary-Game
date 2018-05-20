@@ -90,7 +90,6 @@ public class JoinWindow extends JFrame {
 		};
 		joinGame.addActionListener(getIP);
 	}
-	
 
 	/**
 	 * Method that closes the join window. 

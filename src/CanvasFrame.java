@@ -388,16 +388,4 @@ public class CanvasFrame extends JFrame {
 			}
 		}
 	}
-	
-	/**
-	 * Main method.
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		CanvasFrame cf = new CanvasFrame(800, 640, "Hello", "localhost");
-		cf.connectToServer();
-		cf.setUpFrame();
-		cf.setUpButtons();
-	}
 }
