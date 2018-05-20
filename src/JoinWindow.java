@@ -12,15 +12,13 @@ import java.awt.geom.*;
  */
 public class JoinWindow extends JFrame {
 
-	private JLabel ipLabel, nameLabel;
+	private JLabel ipLabel;
 	private JTextField inputIPAddress;
-	private JTextField inputName;
 	private JButton joinGame;
 	private Container container;
 	
 	private JPanel allPanel, buttonPanel;
 	
-	private String name;
 	private String ip;
 	
 	/**
@@ -32,14 +30,10 @@ public class JoinWindow extends JFrame {
 		allPanel = new JPanel();
 		allPanel.setLayout(new BoxLayout(allPanel, BoxLayout.PAGE_AXIS));
 		allPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
 		
 		ipLabel = new JLabel("Input Server IP Address:");
-		nameLabel = new JLabel("Input your Name:");
 		inputIPAddress = new JTextField(20);
 		inputIPAddress.setMaximumSize(new Dimension(Integer.MAX_VALUE, inputIPAddress.getMinimumSize().height));
-		inputName = new JTextField(20);
-		inputName.setMaximumSize(new Dimension(Integer.MAX_VALUE, inputName.getMinimumSize().height));
 		
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
@@ -54,7 +48,7 @@ public class JoinWindow extends JFrame {
 	 * Method that sets up the join window.
 	 */
 	public void setUpJoinWindow() {
-		this.getContentPane().setPreferredSize(new Dimension(300,130));
+		this.getContentPane().setPreferredSize(new Dimension(300,100));
 		this.pack();
 		this.setTitle("Join Window");
 
@@ -62,8 +56,6 @@ public class JoinWindow extends JFrame {
 		
 		allPanel.add(ipLabel);
 		allPanel.add(inputIPAddress);
-		allPanel.add(nameLabel);
-		allPanel.add(inputName);
 		buttonPanel.add(joinGame);
 		allPanel.add(buttonPanel);
 		container.add(allPanel);
@@ -80,9 +72,8 @@ public class JoinWindow extends JFrame {
 		ActionListener getIP = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				ip = inputIPAddress.getText();
-				name = inputName.getText();
 				closeJoinScreen();
-				CanvasFrame cf = new CanvasFrame(800, 640, name, ip);
+				CanvasFrame cf = new CanvasFrame(800, 640, ip);
 				cf.connectToServer();
 				cf.setUpFrame();
 				cf.setUpButtons();

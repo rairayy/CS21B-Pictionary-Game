@@ -12,7 +12,6 @@ public class GameServer {
 	private int numPlayers, totalNumPlayers, team1Points, team2Points;
 	private boolean continueAccepting;
 	private int artistIndex1, artistIndex2, roundNum, maxRounds;
-	private String artist1Name, artist2Name;
 	
 	private ArrayList<ReadFromClient> readRunnables;
 	private ArrayList<WriteToClient> writeRunnables;
@@ -20,7 +19,9 @@ public class GameServer {
 	
 	private String xyCoords1, xyCoords2;
 	private boolean[] checkRoundEnd;
-
+	private String[] wordList;
+	private String[] wordsToGuess;
+	
 	/**
 	 * Constructor for class GameServer.
 	 */
@@ -37,11 +38,41 @@ public class GameServer {
 		guesses = new ArrayList<String>();
 		xyCoords1 = "";
 		xyCoords2 = "";
+		wordList = new String[50];
+		wordsToGuess = new String[5];
 		try {
 			ss = new ServerSocket(45371);
 		} catch(IOException ex) {
 			System.out.println("IOException from GameServer()");
 		}
+		try {
+			FileReader reader = new FileReader("PictionaryWords");
+			Scanner in = new Scanner(reader);
+			int i = 0;
+			while(in.hasNextLine()) {
+				String line = in.next();
+				wordList[i] = line;
+				i++;
+			}
+			in.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("FileNotFoundException from GameServer()");
+		}
+		
+		determineWords();
+		
+	}
+	
+	/**
+	 * Method for determining the words to guess.
+	 */
+	private void determineWords() {
+		List<String> shuffledList = Arrays.asList(wordList);
+		Collections.shuffle(shuffledList);
+		for(int i = 0; i <wordsToGuess.length; i++) {
+			wordsToGuess[i] = shuffledList.get(i);
+		}
+		System.out.println(Arrays.toString(wordsToGuess));
 	}
 	
 	/**
@@ -109,20 +140,27 @@ public class GameServer {
 	 * 
 	 * @return Integer indicating team that won the round.
 	 */
-	public int determineRoundWinner() {
+	public int determineRoundWinner(int team1, int team2) {
 		for(String curr : guesses) {
-			if(curr.substring(0, curr.length()-1).equals("fellow")) {
+			if(curr.substring(0, curr.length()-1).equalsIgnoreCase(wordsToGuess[roundNum-1])) {
 				if(curr.charAt(curr.length()-1) == '1') {
-					team1Points += 2;
+					team1 += 2;
 					return 1;
 				}
 				else {
-					team2Points += 2;
+					team2 += 2;
 					return 2;
 				}
 			}
 		}
 		return 0;
+	}
+	
+	public boolean checkWinner(int currRound) {
+		if(currRound > 5) {
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean moveToNextRound() {
@@ -194,6 +232,10 @@ public class GameServer {
 					if(guesses.size() > 0) {
 						System.out.println(guesses.toString());
 					}
+					if(checkWinner(roundNum)) {
+						dataIn.close();
+						break;
+					}
 				}
 			} catch(IOException ex) {
 				System.out.println("IOException from RFC run()");
@@ -222,7 +264,7 @@ public class GameServer {
 			playerID = pid;
 			dataOut = out;
 			roundEnd = true;
-			currRound = 0;
+			currRound = 1;
 			System.out.println("WTC" + playerID + " Runnable created");
 		}
 		
@@ -252,6 +294,8 @@ public class GameServer {
 				
 				int currArtist1 = artistIndex1;
 				int currArtist2 = artistIndex2;
+				int team1Tracker = 0;
+				int team2Tracker = 0;
 				
 				while(true) {
 					if(roundEnd) {
@@ -262,7 +306,7 @@ public class GameServer {
 							dataOut.writeUnshared(xyCoords2);
 						}
 						
-						int roundWinner = determineRoundWinner();
+						int roundWinner = determineRoundWinner(team1Tracker, team2Tracker);
 						dataOut.writeInt(roundWinner);
 						if(roundWinner != 0) {
 							System.out.println("#" + playerID + " round ends");
@@ -279,6 +323,8 @@ public class GameServer {
 							
 							artistIndex1 = currArtist1;
 							artistIndex2 = currArtist2;
+							team1Points = team1Tracker;
+							team2Points = team2Tracker;
 							
 							dataOut.writeInt(team1Points);
 							dataOut.writeInt(team2Points);
@@ -296,6 +342,10 @@ public class GameServer {
 							currRound++;
 							checkRoundEnd[playerID-1] = true;
 							dataOut.reset();
+							if(checkWinner(currRound)) {
+								dataOut.close();
+								break;
+							}
 						}
 						dataOut.flush();
 					} else {

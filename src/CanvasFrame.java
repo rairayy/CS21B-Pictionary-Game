@@ -20,12 +20,12 @@ public class CanvasFrame extends JFrame {
 	private Canvas canvas;
 	private WatchCanvas watchCanvas;
 	private JPanel buttonPanel, info, canvasPanel;
-	private JLabel playerName, artistNameL, teamMembersL, typeAnswer;
+	private JLabel typeAnswer, artistLabel, teamLabel;
 	private JTextField answer;
 	private JButton sendAnswer;
-	private String answerString;
+	private String answerString, artistString, teamString;
 	
-	private String name, ip, teamMembers, artistName;
+	private String ip;
 	private int playerID;
     private int artistIndex;
     private int teamNum;
@@ -47,21 +47,20 @@ public class CanvasFrame extends JFrame {
 	 * @param n name of player
 	 * @param i ip address
 	 */
-	public CanvasFrame(int w, int h, String n, String i) {
+	public CanvasFrame(int w, int h, String i) {
 		width = w;
 		height = h;
 		container = this.getContentPane();
-		name = n;
 		ip = i;
-		artistName = "dani";
-		name = "raymond";
-		teamMembers = "riana\ncisco\ncasey";
 		answerString = "";
 		mePoints = 0;
 		enemyPoints = 0;
 		roundNum = 1;
 		maxRounds = 5;
 		setting = 1;
+		
+		artistString = "";
+		teamString = "";
 		
 		// Canvas center
 		canvas = new Canvas();
@@ -87,9 +86,6 @@ public class CanvasFrame extends JFrame {
 		buttonPanel.setPreferredSize(new Dimension(800,58));
 
 		// Info east
-		playerName = new JLabel("Your Name: " + name);
-		artistNameL = new JLabel("Your Team Artist: " + artistName);
-		teamMembersL = new JLabel(teamMembers);
 		typeAnswer = new JLabel("Type Answer Here:");
 		sendAnswer = new JButton("Submit");
 		sendAnswer.setMaximumSize(new Dimension(Integer.MAX_VALUE, sendAnswer.getMinimumSize().height));
@@ -124,15 +120,6 @@ public class CanvasFrame extends JFrame {
 		buttonPanel.add(clear);
 		container.add(buttonPanel, BorderLayout.SOUTH);
 		
-		// Info east
-		info.add(playerName);
-		info.add(artistNameL);
-		info.add(teamMembersL);
-		info.add(typeAnswer);
-		info.add(answer);
-		info.add(sendAnswer);
-		container.add(info, BorderLayout.EAST);
-		
 		this.getContentPane().setBackground(Color.WHITE);
 	}
 	
@@ -146,19 +133,85 @@ public class CanvasFrame extends JFrame {
 			if(playerID == artistIndex) {
 				System.out.println("Canvas added");
 				canvasPanel.removeAll();
+				info.removeAll();
+				
+				// Canvas west
 				canvasPanel.add(canvas);
-				container.add(canvasPanel, BorderLayout.CENTER);
+				container.add(canvasPanel, BorderLayout.WEST);
+				
+				// Info east
+				teamString = "Your Team Number is: " + teamNum;
+				artistString = "You are the artist.";
+				teamLabel = new JLabel(teamString);
+				artistLabel = new JLabel(artistString);
+				info.add(teamLabel);
+				info.add(artistLabel);
+				info.add(typeAnswer);
+				info.add(answer);
+				info.add(sendAnswer);
+				container.add(info, BorderLayout.EAST);
+				
 				container.revalidate();
+				
+				setButtons(true);
+				setFields(false);
 			}
 			else {
 				System.out.println("Watch Canvas added");
 				canvasPanel.removeAll();
+				info.removeAll();
+
+				// Canvas west
 				canvasPanel.add(watchCanvas);
-				container.add(canvasPanel, BorderLayout.CENTER);
+				container.add(canvasPanel, BorderLayout.WEST);
+				
+				// Info east
+				teamString = "Your Team Number is: " + teamNum;
+				artistString = "Wait for your artist.";
+				teamLabel = new JLabel(teamString);
+				artistLabel = new JLabel(artistString);
+				info.add(teamLabel);
+				info.add(artistLabel);
+				info.add(typeAnswer);
+				info.add(answer);
+				info.add(sendAnswer);
+				container.add(info, BorderLayout.EAST);
+				
 				container.revalidate();
+				
+				setButtons(false);
+				setFields(true);
 			}
 		}
 		this.setVisible(v);
+	}
+	
+	/**
+	 * Method that sets the buttons depending on player role.
+	 * 
+	 * @param v Boolean that indicates if buttons should be enabled or disabled.
+	 */
+	public void setButtons(boolean b) {
+		black.setEnabled(b);
+		red.setEnabled(b);
+		blue.setEnabled(b);
+		yellow.setEnabled(b);
+		green.setEnabled(b);
+		eraser.setEnabled(b);
+		five.setEnabled(b);
+		ten.setEnabled(b);
+		twenty.setEnabled(b);
+		clear.setEnabled(b);
+	}
+	
+	/**
+	 * Method that sets the text field and submit button depending on the player's role.
+	 * 
+	 * @param b Boolean that indicates if field and button should be enabled or disabled.
+	 */
+	public void setFields(boolean b) {
+		sendAnswer.setEnabled(b);
+		answer.setEditable(b);
 	}
 	
 	/**
@@ -221,7 +274,7 @@ public class CanvasFrame extends JFrame {
 	 */
 	public void connectToServer() {
     	try {
-			socket = new Socket("localhost", 45371);
+			socket = new Socket(ip, 45371);
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			playerID = in.readInt();
@@ -236,6 +289,25 @@ public class CanvasFrame extends JFrame {
 			System.out.println("IOException from connectToServer()");
 		}
     }
+	
+	private boolean checkWinner() {
+		if(roundNum > 5) {
+			if(mePoints > enemyPoints && teamNum == 1) {
+				this.setTitle("Team 1 has won. Congratulations!");
+			} else if(mePoints > enemyPoints && teamNum == 2) {
+				this.setTitle("Team 2 has won. Congratulations!");
+			} else if(mePoints < enemyPoints && teamNum == 1) {
+				this.setTitle("Team 2 has won. Better luck next time!");
+			} else {
+				this.setTitle("Team 1 has won. Better luck next time!");
+			}
+			this.setButtons(false);
+			this.setFields(false);
+			this.setVisible(true);
+			return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * Inner class that reads from the server. Implements Runnable.
@@ -298,8 +370,15 @@ public class CanvasFrame extends JFrame {
 							}
 							artistIndex = dataIn.readInt();
 							updateVisibility(true);
+							roundNum++;
 							roundEnd = false;
 							wtsRunnable.dataOut.reset();
+							if(checkWinner()) {
+								dataIn.close();
+								break;
+							} else {
+								updateVisibility(true);
+							}
 							continue;
 						} 
 					} else {
@@ -366,6 +445,10 @@ public class CanvasFrame extends JFrame {
 							dataOut.flush();
 							answerString = "";
 						}
+					}
+					if(checkWinner()) {
+						dataOut.close();
+						break;
 					}
 					try {
 						Thread.sleep(5);
