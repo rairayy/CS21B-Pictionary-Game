@@ -155,6 +155,12 @@ public class GameServer {
 		return 0;
 	}
 	
+	/**
+	 * Checks if the game has ended
+	 * 
+	 * @param currRound the current round that just ended
+	 * @return boolean for if the game has ended
+	 */
 	public boolean checkWinner(int currRound) {
 		if(currRound > maxRounds) {
 			return true;
@@ -162,6 +168,10 @@ public class GameServer {
 		return false;
 	}
 	
+	/**
+	 * Checks if the game can move to the next round
+	 * @return true if the game can move to the next round
+	 */
 	public boolean moveToNextRound() {
 		for(int i = 0; i < checkRoundEnd.length; i++) {
 			if(!checkRoundEnd[i]) {

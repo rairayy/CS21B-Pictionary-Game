@@ -68,6 +68,10 @@ public class WatchCanvas extends JComponent {
 		}
 	}
 	
+	/**
+	 * Updates the color based on the color setting
+	 * @param c color setting
+	 */
 	public void updateColor(int c) {
 		switch(c) {
 			case 0:
@@ -94,6 +98,11 @@ public class WatchCanvas extends JComponent {
 		}
 	}
 	
+	/**
+	 * Updates the thickness based on the setting
+	 * 
+	 * @param t thickness setting
+	 */
 	private void updateThickness(int t) {
 		switch(t) {
 			case 7:

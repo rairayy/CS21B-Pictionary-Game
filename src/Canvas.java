@@ -26,7 +26,6 @@ public class Canvas extends JComponent {
 		
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				System.out.println("pressed");
 				if(enabled) {
 					oldX = e.getX();
 					oldY = e.getY();
@@ -79,7 +78,6 @@ public class Canvas extends JComponent {
 	 */
 	public void changeEnabled(boolean e) {
 		enabled = e;
-		System.out.println("enabled: "+ enabled);
 	}
 	
 	/**
@@ -166,33 +164,6 @@ public class Canvas extends JComponent {
 		g2d.setPaint(Color.WHITE);
 	}
 	
-	/**
-	 * Method that gets old x-coordinate.
-	 */
-	public int getOldX() {
-		return oldX;
-	}
-	
-	/**
-	 * Method that gets old y-coordinate.
-	 */
-	public int getOldY() {
-		return oldY;
-	}
-	
-	/**
-	 * Method that gets current x-coordinate.
-	 */
-	public int getCurrX() {
-		return currX;
-	}
-	
-	/**
-	 * Method that gets current y-coordinate.
-	 */
-	public int getCurrY() {
-		return currY;
-	}
 	
 	/**
 	 * Method that gets the x-coordinate ArrayList.

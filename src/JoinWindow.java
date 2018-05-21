@@ -73,7 +73,7 @@ public class JoinWindow extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				ip = inputIPAddress.getText();
 				closeJoinScreen();
-				CanvasFrame cf = new CanvasFrame(800, 640, ip);
+				Player cf = new Player(800, 640, ip);
 				cf.connectToServer();
 				cf.setUpFrame();
 				cf.setUpButtons();
