@@ -16,7 +16,6 @@ public class WatchCanvas extends JComponent {
 	private float thickness;
 	private String xCoords, yCoords;
 	private int color, thicknessLevel;
-//	private int setting;
 	
 	/**
 	 * Constructor for class WatchCanvas.
@@ -26,7 +25,6 @@ public class WatchCanvas extends JComponent {
 		setDoubleBuffered(false);
 		xCoords = "";
 		yCoords = "";
-//		setting = 0;
 		color = 1;
 		thicknessLevel = 7;
 	}
@@ -41,7 +39,6 @@ public class WatchCanvas extends JComponent {
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
 		} else {
-//			updateSettings(setting);
 			updateColor(color);
 			updateThickness(thicknessLevel);
 			parseCoordinates(xCoords, yCoords, g2d);
@@ -71,46 +68,6 @@ public class WatchCanvas extends JComponent {
 		}
 	}
 	
-	/**
-	 * Method that updates the line style.
-	 * 
-	 * @param s Integer that indicates the change in setting.
-	 */
-//	public void updateSettings(int s) {
-//		switch(s) {
-//			case 0:
-//				clear();
-//				break;
-//			case 1:
-//				black();
-//				break;
-//			case 2:
-//				red();
-//				break;
-//			case 3:
-//				blue();
-//				break;
-//			case 4:
-//				yellow();
-//				break;
-//			case 5:
-//				green();
-//				break;
-//			case 6:
-//				eraser();
-//				break;
-//			case 7:
-//				set5();
-//				break;
-//			case 8:
-//				set10();
-//				break;
-//			case 9:
-//				set20();
-//				break;
-//		}
-//	}
-	
 	public void updateColor(int c) {
 		switch(c) {
 			case 0:
@@ -133,15 +90,6 @@ public class WatchCanvas extends JComponent {
 				break;
 			case 6:
 				eraser();
-				break;
-			case 7:
-				set5();
-				break;
-			case 8:
-				set10();
-				break;
-			case 9:
-				set20();
 				break;
 		}
 	}
@@ -172,7 +120,6 @@ public class WatchCanvas extends JComponent {
 		if (x.length() > 2 && y.length() > 2) {
 			String[] xCoordsA = x.split(", ");
 			String[] yCoordsA = y.split(", ");
-//			System.out.println(Arrays.toString(xCoordsA));
 			for(int i = 0; i < xCoordsA.length-1; i++) {
 				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 				g2d.setStroke(bs);  
@@ -235,28 +182,28 @@ public class WatchCanvas extends JComponent {
 	 * Method that sets paint color to red.
 	 */
 	public void red() {
-		g2d.setPaint(Color.RED);
+		g2d.setPaint(new Color(223, 38, 45));
 	}
 
 	/**
 	 * Method that sets paint color to blue.
 	 */
 	public void blue() {
-		g2d.setPaint(Color.BLUE);
+		g2d.setPaint(new Color(0, 83, 159));
 	}
 	
 	/**
 	 * Method that sets paint color to yellow.
 	 */
 	public void yellow() {
-		g2d.setPaint(Color.YELLOW);
+		g2d.setPaint(new Color(255, 162, 0));
 	}
 	
 	/**
 	 * Method that sets paint color to green.
 	 */
 	public void green() {
-		g2d.setPaint(Color.GREEN);
+		g2d.setPaint(new Color(45, 177, 53));
 	}
 	
 	/**

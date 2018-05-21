@@ -1,8 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -77,16 +79,64 @@ public class CanvasFrame extends JFrame {
 		canvasPanel.setPreferredSize(new Dimension(600,576));
 		
 		// Buttons south
-		five = new JButton("5");
-		ten = new JButton("10");
-		twenty = new JButton("20");
-		clear = new JButton("Clear");
-		black = new JButton("Black");
-		red = new JButton("Red");
-		blue = new JButton("Blue");
-		yellow = new JButton("Yellow");
-		green = new JButton("Green");
-		eraser = new JButton("Eraser");
+		
+		BufferedImage fiveIcon, tenIcon, twentyIcon, clearIcon, blackIcon, redIcon, blueIcon, yellowIcon, greenIcon, eraserIcon;
+		try {
+			fiveIcon = ImageIO.read(new File("five.png"));
+			tenIcon = ImageIO.read(new File("ten.png"));
+			twentyIcon = ImageIO.read(new File("twenty.png"));
+			clearIcon = ImageIO.read(new File("clear.png"));
+			blackIcon = ImageIO.read(new File("black.png"));
+			redIcon = ImageIO.read(new File("red.png"));
+			blueIcon = ImageIO.read(new File("blue.png"));
+			yellowIcon = ImageIO.read(new File("yellow.png"));
+			greenIcon = ImageIO.read(new File("green.png"));
+			eraserIcon = ImageIO.read(new File("eraser.png"));
+			
+			five = new JButton(new ImageIcon(fiveIcon));
+			five.setBorder(BorderFactory.createEmptyBorder());
+			five.setContentAreaFilled(false);
+			ten = new JButton(new ImageIcon(tenIcon));
+			ten.setBorder(BorderFactory.createEmptyBorder());
+			ten.setContentAreaFilled(false);
+			twenty = new JButton(new ImageIcon(twentyIcon));
+			twenty.setBorder(BorderFactory.createEmptyBorder());
+			twenty.setContentAreaFilled(false);
+			clear = new JButton(new ImageIcon(clearIcon));
+			clear.setBorder(BorderFactory.createEmptyBorder());
+			clear.setContentAreaFilled(false);
+			black = new JButton(new ImageIcon(blackIcon));
+			black.setBorder(BorderFactory.createEmptyBorder());
+			black.setContentAreaFilled(false);
+			red = new JButton(new ImageIcon(redIcon));
+			red.setBorder(BorderFactory.createEmptyBorder());
+			red.setContentAreaFilled(false);
+			blue = new JButton(new ImageIcon(blueIcon));
+			blue.setBorder(BorderFactory.createEmptyBorder());
+			blue.setContentAreaFilled(false);
+			yellow = new JButton(new ImageIcon(yellowIcon));
+			yellow.setBorder(BorderFactory.createEmptyBorder());
+			yellow.setContentAreaFilled(false);
+			green = new JButton(new ImageIcon(greenIcon));
+			green.setBorder(BorderFactory.createEmptyBorder());
+			green.setContentAreaFilled(false);
+			eraser = new JButton(new ImageIcon(eraserIcon));
+			eraser.setBorder(BorderFactory.createEmptyBorder());
+			eraser.setContentAreaFilled(false);
+		} catch (IOException e) {
+			System.out.println("IOException in CanvasFrame()");
+			five = new JButton("5");
+			ten = new JButton("10");
+			twenty = new JButton("20");
+			clear = new JButton("Clear");
+			black = new JButton("Black");
+			red = new JButton("Red");
+			blue = new JButton("Blue");
+			yellow = new JButton("Yellow");
+			green = new JButton("Green");
+			eraser = new JButton("Eraser");
+		}
+		
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(1,10));
 		buttonPanel.setPreferredSize(new Dimension(800,58));
@@ -494,11 +544,6 @@ public class CanvasFrame extends JFrame {
 						String x = xCoords2.toString();
 						String y = yCoords2.toString();
 						String z = fromClientSettings+x+y;
-//						if(!fromClientSettings.equals("00")) {
-//							z = fromClientSettings+x+y;
-//						} else {
-//							z = "0";
-//						}
 						if(xCoords.size() > 0) {
 							dataOut.writeUnshared(z);
 							dataOut.flush();

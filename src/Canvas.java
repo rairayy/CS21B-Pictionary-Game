@@ -135,28 +135,28 @@ public class Canvas extends JComponent {
 	 * 
 	 */
 	public void red() {
-		g2d.setPaint(Color.RED);
+		g2d.setPaint(new Color(223, 38, 45));
 	}
 
 	/**
 	 * Method that sets paint color to blue.
 	 */
 	public void blue() {
-		g2d.setPaint(Color.BLUE);
+		g2d.setPaint(new Color(0, 83, 159));
 	}
 	
 	/**
 	 * Method that sets paint color to yellow.
 	 */
 	public void yellow() {
-		g2d.setPaint(Color.YELLOW);
+		g2d.setPaint(new Color(255, 162, 0));
 	}
 	
 	/**
 	 * Method that sets paint color to green.
 	 */
 	public void green() {
-		g2d.setPaint(Color.GREEN);
+		g2d.setPaint(new Color(45, 177, 53));
 	}
 	
 	/**
