@@ -20,7 +20,7 @@ public class CanvasFrame extends JFrame {
 	private JButton clear, black, red, blue, yellow, green, eraser, five, ten, twenty;
 	private Canvas canvas;
 	private WatchCanvas watchCanvas;
-	private JPanel buttonPanel, info, canvasPanel;
+	private JPanel buttonPanel, info, canvasPanel, messagePanel;
 	private JLabel typeAnswer, artistLabel, teamLabel, messageLabel;
 	private JTextField answer;
 	private JButton sendAnswer;
@@ -39,7 +39,6 @@ public class CanvasFrame extends JFrame {
 	private WriteToServer wtsRunnable;
 	private Socket socket;
 	
-//	private int setting;
 	private String color;
 	private String thickness;
 		
@@ -101,7 +100,10 @@ public class CanvasFrame extends JFrame {
 		info = new JPanel();
 		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
 		info.setPreferredSize(new Dimension(200,576));
-		info.setBorder(new EmptyBorder(10, 10, 10, 10));
+		info.setBorder(new EmptyBorder(20, 10, 10, 10));
+		messagePanel = new JPanel();
+		messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.PAGE_AXIS));
+		messagePanel.setBorder(new EmptyBorder(20,0,20,0));
 		
 		ws = new WaitingScreen();
 		Thread t = new Thread(ws);
@@ -155,10 +157,11 @@ public class CanvasFrame extends JFrame {
 				artistString = "You are the artist.";
 				teamLabel = new JLabel(teamString);
 				artistLabel = new JLabel(artistString);
-				messageLabel = new JLabel("Your word is: " + wordToGuess + ". You may start drawing in 5 seconds.");
+				messageLabel = new JLabel("<html>Your word is: " + wordToGuess + ".<br>You may start drawing<br>in 5 seconds.</html>");
 				info.add(teamLabel);
 				info.add(artistLabel);
-				info.add(messageLabel);
+				messagePanel.add(messageLabel);
+				info.add(messagePanel);
 				info.add(typeAnswer);
 				info.add(answer);
 				info.add(sendAnswer);
@@ -183,10 +186,11 @@ public class CanvasFrame extends JFrame {
 				artistString = "Wait for your artist.";
 				teamLabel = new JLabel(teamString);
 				artistLabel = new JLabel(artistString);
-				messageLabel = new JLabel("The artist will start drawing in 5 seconds.");
+				messageLabel = new JLabel("<html>The artist will<br>start drawing<br>in 5 seconds.</html>");
 				info.add(teamLabel);
 				info.add(artistLabel);
-				info.add(messageLabel);
+				messagePanel.add(messageLabel);
+				info.add(messagePanel);
 				info.add(typeAnswer);
 				info.add(answer);
 				info.add(sendAnswer);
@@ -312,16 +316,20 @@ public class CanvasFrame extends JFrame {
 			System.out.println("Enemy: " + enemyPoints);
 			if(mePoints > enemyPoints && teamNum == 1) {
 				this.setTitle("Team 1 has won. Congratulations!");
+				messageLabel.setText("CONGRATULATIONS!");
 			} else if(mePoints > enemyPoints && teamNum == 2) {
 				this.setTitle("Team 2 has won. Congratulations!");
+				messageLabel.setText("CONGRATULATIONS!");
 			} else if(mePoints < enemyPoints && teamNum == 1) {
 				this.setTitle("Team 2 has won. Better luck next time!");
+				messageLabel.setText("YOU'LL GET 'EM NEXT TIME!");
 			} else {
-				this.setTitle("Team 1 has won. Better luck next time!");
+				this.setTitle("YOU'LL GET 'EM NEXT TIME!");
 			}
 			this.setButtons(false);
 			this.setFields(false);
 			this.setVisible(true);
+			canvas.changeEnabled(false);
 			return true;
 		}
 		return false;
@@ -329,12 +337,18 @@ public class CanvasFrame extends JFrame {
 	
 	private void changeMessageLabel() {
 		canvas.changeEnabled(false);
+		setButtons(false);
+		setFields(false);
 		Timer timer = new Timer(7000, new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				if(playerID == artistIndex) {
-					messageLabel.setText("Start drawing! Your word is: " + wordToGuess);
+					messageLabel.setText("<html>Start drawing! Your word<br>is: " + wordToGuess +"</html>");
+					setButtons(true);
+					setFields(false);
 				} else {
-					messageLabel.setText("Start guessing!");
+					messageLabel.setText("<html>Start guessing!</html>");
+					setButtons(false);
+					setFields(true);
 				}
 				canvas.changeEnabled(true);
 				revalidate();
@@ -346,9 +360,9 @@ public class CanvasFrame extends JFrame {
 	
 	private void initialMessage() {
 		if(playerID == artistIndex) {
-			messageLabel.setText("Your word is: " + wordToGuess + ". You may start drawing in 5 seconds.");
+			messageLabel.setText("<html>Your word is: " + wordToGuess + ".<br>You may start <br>drawing in 5 seconds.</html>");
 		} else {
-			messageLabel.setText("The artist will start drawing in 5 seconds.");
+			messageLabel.setText("<html>The artist will start<br>drawing in 5 seconds.</html>");
 		}
 		
 		changeMessageLabel();
