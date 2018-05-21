@@ -12,6 +12,7 @@ public class Canvas extends JComponent {
 	private int currX, currY, oldX, oldY;
 	private float thickness;
 	private ArrayList<Integer> xCoords, yCoords;
+	private boolean enabled;
 	
 	/**
 	 * Constructor for class Canvas.
@@ -21,30 +22,39 @@ public class Canvas extends JComponent {
 		setDoubleBuffered(false);
 		xCoords = new ArrayList<Integer>();
 		yCoords = new ArrayList<Integer>();
+		enabled = false;
+		
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				oldX = e.getX();
-				oldY = e.getY();
-				xCoords.add(oldX);
-				yCoords.add(oldY);
+				System.out.println("pressed");
+				if(enabled) {
+					oldX = e.getX();
+					oldY = e.getY();
+					xCoords.add(oldX);
+					yCoords.add(oldY);
+				}
 			}
 			public void mouseReleased(MouseEvent e) {
-				xCoords.clear();
-				yCoords.clear();
+				if(enabled) {
+					xCoords.clear();
+					yCoords.clear();
+				}
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
-				currX = e.getX();
-				currY = e.getY();
-				BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-			    g2d.setStroke(bs);  
-			    g2d.drawLine(oldX, oldY, currX, currY);
-				repaint();
-				oldX = currX;
-				oldY = currY;
-				xCoords.add(currX);
-				yCoords.add(currY);
+				if(enabled) {
+					currX = e.getX();
+					currY = e.getY();
+					BasicStroke bs = new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+				    g2d.setStroke(bs);  
+				    g2d.drawLine(oldX, oldY, currX, currY);
+					repaint();
+					oldX = currX;
+					oldY = currY;
+					xCoords.add(currX);
+					yCoords.add(currY);
+				}
 			}
 		});
 	}
@@ -60,6 +70,16 @@ public class Canvas extends JComponent {
 			clear();
 		}
 		g.drawImage(image, 0, 0, null);
+	}
+	
+	/**
+	 * Makes the canvas editable/uneditable.
+	 * 
+	 * @param e  Variable for being enabled
+	 */
+	public void changeEnabled(boolean e) {
+		enabled = e;
+		System.out.println("enabled: "+ enabled);
 	}
 	
 	/**

@@ -16,11 +16,12 @@ public class CanvasFrame extends JFrame {
 	private int width;
 	private int height;
 	private Container container;
+	private WaitingScreen ws;
 	private JButton clear, black, red, blue, yellow, green, eraser, five, ten, twenty;
 	private Canvas canvas;
 	private WatchCanvas watchCanvas;
 	private JPanel buttonPanel, info, canvasPanel;
-	private JLabel typeAnswer, artistLabel, teamLabel;
+	private JLabel typeAnswer, artistLabel, teamLabel, messageLabel;
 	private JTextField answer;
 	private JButton sendAnswer;
 	private String answerString, artistString, teamString;
@@ -30,13 +31,17 @@ public class CanvasFrame extends JFrame {
     private int artistIndex;
     private int teamNum;
     private int mePoints, enemyPoints;
-    private int roundNum, maxRounds;
+    private int roundNum;
+    private final int maxRounds;
+    private String wordToGuess;
     
 	private ReadFromServer rfsRunnable;
 	private WriteToServer wtsRunnable;
 	private Socket socket;
 	
-	private int setting;
+//	private int setting;
+	private String color;
+	private String thickness;
 		
 	/**
 	 * 
@@ -57,10 +62,12 @@ public class CanvasFrame extends JFrame {
 		enemyPoints = 0;
 		roundNum = 1;
 		maxRounds = 5;
-		setting = 1;
+		color = "1";
+		thickness = "7";
 		
 		artistString = "";
 		teamString = "";
+		wordToGuess = "";
 		
 		// Canvas center
 		canvas = new Canvas();
@@ -95,6 +102,10 @@ public class CanvasFrame extends JFrame {
 		info.setLayout(new BoxLayout(info, BoxLayout.PAGE_AXIS));
 		info.setPreferredSize(new Dimension(200,576));
 		info.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		ws = new WaitingScreen();
+		Thread t = new Thread(ws);
+		t.start();
 	}
 	
 	/**
@@ -144,8 +155,10 @@ public class CanvasFrame extends JFrame {
 				artistString = "You are the artist.";
 				teamLabel = new JLabel(teamString);
 				artistLabel = new JLabel(artistString);
+				messageLabel = new JLabel("Your word is: " + wordToGuess + ". You may start drawing in 5 seconds.");
 				info.add(teamLabel);
 				info.add(artistLabel);
+				info.add(messageLabel);
 				info.add(typeAnswer);
 				info.add(answer);
 				info.add(sendAnswer);
@@ -170,8 +183,10 @@ public class CanvasFrame extends JFrame {
 				artistString = "Wait for your artist.";
 				teamLabel = new JLabel(teamString);
 				artistLabel = new JLabel(artistString);
+				messageLabel = new JLabel("The artist will start drawing in 5 seconds.");
 				info.add(teamLabel);
 				info.add(artistLabel);
+				info.add(messageLabel);
 				info.add(typeAnswer);
 				info.add(answer);
 				info.add(sendAnswer);
@@ -225,34 +240,34 @@ public class CanvasFrame extends JFrame {
 					wtsRunnable.sendClear();
 				} else if ( ae.getSource() == black ) {
 					canvas.black();
-					setting = 1;
+					color = "1";
 				} else if ( ae.getSource() == red ) {
 					canvas.red();
-					setting = 2;
+					color = "2";
 				} else if ( ae.getSource() == blue ) {
 					canvas.blue();
-					setting = 3;
+					color = "3";
 				} else if ( ae.getSource() == yellow ) {
 					canvas.yellow();
-					setting = 4;
+					color = "4";
 				} else if ( ae.getSource() == green ) {
 					canvas.green();
-					setting = 5;
+					color = "5";
 				} else if ( ae.getSource() == eraser ) {
 					canvas.eraser();
-					setting = 6;
+					color = "6";
 				} else if ( ae.getSource() == five ) {
 					canvas.set5();
-					setting = 7;
+					thickness = "7";
 				} else if ( ae.getSource() == ten ) {
 					canvas.set10();
-					setting = 8;
+					thickness = "8";
 				} else if ( ae.getSource() == sendAnswer ) {
 					answerString = answer.getText();
 					answer.setText("");
 				} else {
 					canvas.set20();
-					setting = 9;
+					thickness = "9";
 				}
 			}
 		};
@@ -291,7 +306,10 @@ public class CanvasFrame extends JFrame {
     }
 	
 	private boolean checkWinner() {
-		if(roundNum > 5) {
+		if(roundNum > maxRounds) {
+			System.out.println("Rounds: " + roundNum);
+			System.out.println("Me: " + mePoints);
+			System.out.println("Enemy: " + enemyPoints);
 			if(mePoints > enemyPoints && teamNum == 1) {
 				this.setTitle("Team 1 has won. Congratulations!");
 			} else if(mePoints > enemyPoints && teamNum == 2) {
@@ -307,6 +325,33 @@ public class CanvasFrame extends JFrame {
 			return true;
 		}
 		return false;
+	}
+	
+	private void changeMessageLabel() {
+		canvas.changeEnabled(false);
+		Timer timer = new Timer(7000, new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				if(playerID == artistIndex) {
+					messageLabel.setText("Start drawing! Your word is: " + wordToGuess);
+				} else {
+					messageLabel.setText("Start guessing!");
+				}
+				canvas.changeEnabled(true);
+				revalidate();
+			}
+		});
+		timer.setRepeats(false);
+		timer.start();
+	}
+	
+	private void initialMessage() {
+		if(playerID == artistIndex) {
+			messageLabel.setText("Your word is: " + wordToGuess + ". You may start drawing in 5 seconds.");
+		} else {
+			messageLabel.setText("The artist will start drawing in 5 seconds.");
+		}
+		
+		changeMessageLabel();
 	}
 	
 	/**
@@ -333,7 +378,11 @@ public class CanvasFrame extends JFrame {
 			try {
 				teamNum = dataIn.readInt();
 				artistIndex = dataIn.readInt();
+				wordToGuess = dataIn.readUTF();
 				updateVisibility(true);
+				ws.closeWaitingScreen();
+				changeMessageLabel();
+				
 				System.out.println("Team Num #" + teamNum);
 				System.out.println("Artist Num #" + artistIndex);
 				System.out.println("C Width: " + canvas.getSize().width);
@@ -369,21 +418,23 @@ public class CanvasFrame extends JFrame {
 								watchCanvas.empty();
 							}
 							artistIndex = dataIn.readInt();
-							updateVisibility(true);
 							roundNum++;
 							roundEnd = false;
-							wtsRunnable.dataOut.reset();
 							if(checkWinner()) {
 								dataIn.close();
 								break;
 							} else {
+								wtsRunnable.dataOut.reset();
 								updateVisibility(true);
 							}
 							continue;
 						} 
 					} else {
-						setting = 1;
+						color = "1";
+						thickness = "7";
+						wordToGuess = dataIn.readUTF();
 						roundEnd = dataIn.readBoolean();
+						initialMessage();
 						System.out.println("Round started: " + roundEnd);
 					}
 				}
@@ -420,7 +471,7 @@ public class CanvasFrame extends JFrame {
 			try {
 				while(true) {
 					if(playerID == artistIndex) {
-						int fromClientSettings = setting;
+						String fromClientSettings = color + thickness;
 						
 						ArrayList<Integer> xCoords = canvas.getXCoords();
 						ArrayList<Integer> yCoords = canvas.getYCoords();
@@ -429,11 +480,11 @@ public class CanvasFrame extends JFrame {
 						String x = xCoords2.toString();
 						String y = yCoords2.toString();
 						String z = fromClientSettings+x+y;
-						if(fromClientSettings != 0) {
-							z = fromClientSettings+x+y;
-						} else {
-							z = "0";
-						}
+//						if(!fromClientSettings.equals("00")) {
+//							z = fromClientSettings+x+y;
+//						} else {
+//							z = "0";
+//						}
 						if(xCoords.size() > 0) {
 							dataOut.writeUnshared(z);
 							dataOut.flush();

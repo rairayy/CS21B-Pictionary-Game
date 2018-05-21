@@ -11,7 +11,8 @@ public class GameServer {
 	private ServerSocket ss;
 	private int numPlayers, totalNumPlayers, team1Points, team2Points;
 	private boolean continueAccepting;
-	private int artistIndex1, artistIndex2, roundNum, maxRounds;
+	private int artistIndex1, artistIndex2, roundNum;
+	private final int maxRounds;
 	
 	private ArrayList<ReadFromClient> readRunnables;
 	private ArrayList<WriteToClient> writeRunnables;
@@ -140,15 +141,13 @@ public class GameServer {
 	 * 
 	 * @return Integer indicating team that won the round.
 	 */
-	public int determineRoundWinner(int team1, int team2) {
+	public int determineRoundWinner() {
 		for(String curr : guesses) {
 			if(curr.substring(0, curr.length()-1).equalsIgnoreCase(wordsToGuess[roundNum-1])) {
 				if(curr.charAt(curr.length()-1) == '1') {
-					team1 += 2;
 					return 1;
 				}
 				else {
-					team2 += 2;
 					return 2;
 				}
 			}
@@ -157,7 +156,7 @@ public class GameServer {
 	}
 	
 	public boolean checkWinner(int currRound) {
-		if(currRound > 5) {
+		if(currRound > maxRounds) {
 			return true;
 		}
 		return false;
@@ -287,6 +286,7 @@ public class GameServer {
 					dataOut.writeInt(artistIndex1);
 				else
 					dataOut.writeInt(artistIndex2);
+				dataOut.writeUTF(wordsToGuess[0]);
 				dataOut.flush();
 				System.out.println("Player#" + playerID + ": Team Num #" + teamNum);
 				System.out.println("Artist1 Num #" + artistIndex1);
@@ -306,7 +306,7 @@ public class GameServer {
 							dataOut.writeUnshared(xyCoords2);
 						}
 						
-						int roundWinner = determineRoundWinner(team1Tracker, team2Tracker);
+						int roundWinner = determineRoundWinner();
 						dataOut.writeInt(roundWinner);
 						if(roundWinner != 0) {
 							System.out.println("#" + playerID + " round ends");
@@ -323,6 +323,11 @@ public class GameServer {
 							
 							artistIndex1 = currArtist1;
 							artistIndex2 = currArtist2;
+							
+							if(roundWinner == 1)
+								team1Tracker += 2;
+							else
+								team2Tracker += 2;
 							team1Points = team1Tracker;
 							team2Points = team2Tracker;
 							
@@ -352,6 +357,7 @@ public class GameServer {
 						if(moveToNextRound()) {
 							roundNum = currRound;
 							roundEnd = true;
+							dataOut.writeUTF(wordsToGuess[roundNum-1]);
 							dataOut.writeBoolean(roundEnd);
 							System.out.println("Move to next round: " + roundEnd);
 						}
